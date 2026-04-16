@@ -1,1 +1,236 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gacha Tracker - Reativo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+  
+  <!-- 🌟 MAGIA AQUI: Importando o Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    /* ── SEU CSS ORIGINAL MANTIDO AQUI (resumido para focar no JS) ── */
+    :root {
+      --bg: #080b10; --card: #0f1520; --card2: #131a28; --card3: #0b1019;
+      --border: rgba(80, 160, 255, .13); --border2: rgba(80, 160, 255, .28);
+      --accent: #2e9fff; --accent2: #5bc4ff; --aR: 46; --aG: 159; --aB: 255;
+      --gold: #f0c040; --red: #ff5070; --green: #30e08a; --purple: #b47fff;
+      --text: #ccd6f0; --muted: #4a5878; --muted2: #7080a0;
+    }
+    [data-game="genshin"] { --accent: #c9a227; --accent2: #f0d060; --aR: 201; --aG: 162; --aB: 39; --card: #1a1c10; --card2: #20221a; --border: rgba(200, 180, 80, .15); }[data-game="hsr"] { --accent: #9b59f5; --accent2: #c090ff; --aR: 155; --aG: 89; --aB: 245; --card: #130f1e; --card2: #1a1428; --border: rgba(160, 100, 255, .15); }
+    [data-game="zzz"] { --accent: #00f5f5; --accent2: #5effff; --aR: 0; --aG: 245; --aB: 245; --card: #0a1111; --card2: #101a1a; --border: rgba(0, 245, 245, 0.15); }
+    [data-game="endfield"] { --accent: #30e08a; --accent2: #60ffaa; --aR: 48; --aG: 224; --aB: 138; --card: #0f1a14; --card2: #142018; --border: rgba(48, 224, 138, .14); }
+
+    body { background: var(--bg); color: var(--text); font-family: "Exo 2", sans-serif; margin: 0; padding-top: 52px; transition: background .5s, color .5s; }
+    
+    /* Classes de layout básicas do seu código */
+    .topnav { position: fixed; top: 0; left: 0; right: 0; height: 52px; background: rgba(8, 11, 16, .93); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 18px; z-index: 200;}
+    .tracker-layout { display: flex; min-height: calc(100vh - 52px); }
+    .cards-rail { width: 190px; padding: 20px 14px; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid rgba(255, 255, 255, 0.05); }
+    .game-card { border-radius: 12px; padding: 10px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; transition: 0.3s; }
+    .game-card.active { border-color: var(--accent); background: rgba(var(--aR), var(--aG), var(--aB), 0.15); }
+    .main-panel { flex: 1; padding: 22px 26px; }
+    .pblock { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+    
+    /* Inputs e botões */
+    .pe-inp { background: var(--card2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 8px 9px; outline: none; width: 100%; margin-bottom: 10px;}
+    .btn-post { background: var(--accent); border: none; border-radius: 7px; color: #fff; padding: 10px; cursor: pointer; width: 100%; font-weight: bold;}
+    
+    /* Histórico */
+    .hist-item { display: flex; align-items: center; gap: 10px; padding: 9px 11px; background: var(--card2); border: 1px solid var(--border); border-radius: 9px; margin-bottom: 5px;}
+    .c-g { color: var(--green); } .c-y { color: var(--gold); } .c-r { color: var(--red); }
+  </style>
+</head>
+
+<!-- O x-data diz ao Alpine: "O corpo todo do site será gerenciado pela store chamada 'tracker'" -->
+<!-- O :data-game é reativo. Quando a variável activeGame muda, a cor do site inteiro muda sozinho! -->
+<body x-data x-bind:data-game="$store.tracker.activeGame">
+
+  <nav class="topnav">
+    <strong style="color: var(--accent)">GACHA TRACKER REATIVO</strong>
+  </nav>
+
+  <div class="tracker-layout">
+    
+    <!-- MENU LATERAL -->
+    <div class="cards-rail">
+      <!-- 🌟 LAÇO DE REPETIÇÃO: Em vez de criar 4 cards no HTML, mandamos o Alpine gerar pra cada jogo -->
+      <template x-for="game in $store.tracker.games" :key="game.id">
+        <div class="game-card" 
+             :class="{ 'active': $store.tracker.activeGame === game.id }"
+             @click="$store.tracker.selectGame(game.id)">
+             <!-- ^ Ao clicar, dispara a função selectGame na Store -->
+          <span x-text="game.short"></span>
+        </div>
+      </template>
+    </div>
+
+    <!-- ÁREA PRINCIPAL -->
+    <div class="main-panel">
+      
+      <!-- Mensagem de Boas vindas se não tiver jogo selecionado -->
+      <div x-show="!$store.tracker.activeGame">
+        <h2>Selecione um jogo ao lado</h2>
+      </div>
+
+      <!-- PAINEL DO JOGO SELECIONADO -->
+      <div x-show="$store.tracker.activeGame">
+        <h1 x-text="$store.tracker.currentGameData.name" style="color: var(--accent)"></h1>
+        
+        <div class="pblock">
+          <h3>Pity Atual (5 Estrelas)</h3>
+          <!-- 🌟 MÁGICA DOS DADOS: Mostrando os valores direto da memória -->
+          <p>Último Personagem: <strong x-text="$store.tracker.currentPity.char || 'Nenhum'"></strong></p>
+          <p>Você parou no pity: <strong x-text="$store.tracker.currentPity.curPity" style="font-size: 24px; color: var(--accent2)"></strong></p>
+          <p>Garantido (50/50): <strong x-text="$store.tracker.currentPity.fifty === 'L' ? 'Sim' : 'Não'" class="c-y"></strong></p>
+        </div>
+
+        <!-- FORMULÁRIO DE NOVO PULL -->
+        <div class="pblock">
+          <h3>Registrar Pull 5★</h3>
+          <!-- O x-model "amarra" o input na variável. Se você digitar aqui, a variável no JS muda em tempo real -->
+          <input type="text" class="pe-inp" placeholder="Nome exato do 5★ (Ex: Hu Tao)" x-model="$store.tracker.form.char">
+          <input type="number" class="pe-inp" placeholder="Pity em que foi pego (Ex: 78)" x-model.number="$store.tracker.form.pullPity">
+          <input type="number" class="pe-inp" placeholder="Pity atual agora (Ex: 0)" x-model.number="$store.tracker.form.curPity">
+          
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button @click="$store.tracker.form.fifty = 'W'" :style="$store.tracker.form.fifty === 'W' ? 'background:var(--green)' : ''" class="pe-inp">W (Ganhou)</button>
+            <button @click="$store.tracker.form.fifty = 'L'" :style="$store.tracker.form.fifty === 'L' ? 'background:var(--red)' : ''" class="pe-inp">L (Perdeu)</button>
+          </div>
+
+          <!-- Ao clicar, chamamos a função savePull. Se faltar dados, desabilita o botão -->
+          <button class="btn-post" 
+                  @click="$store.tracker.savePull()"
+                  :disabled="!$store.tracker.form.char">
+            ✓ Postar no histórico
+          </button>
+        </div>
+
+        <!-- LISTA DE HISTÓRICO REATIVA -->
+        <div class="pblock">
+          <h3>Histórico Recente</h3>
+          <template x-for="(pull, index) in $store.tracker.currentHistory" :key="index">
+            <div class="hist-item">
+               <strong x-text="pull.char"></strong> 
+               <span>- Pity: <span x-text="pull.pullPity"></span></span>
+               <span :class="pull.fifty === 'W' ? 'c-g' : 'c-r'" x-text="pull.fifty === 'W' ? 'Ganhou 50/50' : 'Perdeu 50/50'"></span>
+               <button @click="$store.tracker.deleteHistory(index)" style="margin-left: auto; color: var(--red); background: none; border: none; cursor: pointer;">Excluir</button>
+            </div>
+          </template>
+          <div x-show="$store.tracker.currentHistory.length === 0" style="color: var(--muted)">Nenhum pull registrado ainda.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 🌟 O "CÉREBRO" DA APLICAÇÃO -->
+  <script>
+    // Quando o Alpine iniciar, criamos nossa "Store" (Banco de dados de estado)
+    document.addEventListener('alpine:init', () => {
+      
+      Alpine.store('tracker', {
+        // 1. Variáveis Iniciais
+        activeGame: null,
+        
+        games:[
+          { id: "genshin", name: "Genshin Impact", short: "Genshin" },
+          { id: "hsr", name: "Honkai: Star Rail", short: "Star Rail" },
+          { id: "zzz", name: "Zenless Zone Zero", short: "Zenless" },
+          { id: "endfield", name: "Arknights: Endfield", short: "Endfield" },
+        ],
+
+        // Aqui guardamos os dados lidos do localStorage
+        userData: {
+          genshin: { pity: { curPity: 0 }, history:[] },
+          hsr: { pity: { curPity: 0 }, history:[] },
+          zzz: { pity: { curPity: 0 }, history: [] },
+          endfield: { pity: { curPity: 0 }, history:[] }
+        },
+
+        // Formulário temporário para registrar um novo pull
+        form: { char: '', pullPity: '', curPity: '', fifty: '' },
+
+        // 2. Init: Executa sozinho quando a página carrega
+        init() {
+          this.loadAllData();
+          // Se quiser, pode abrir o genshin direto:
+          // this.selectGame('genshin');
+        },
+
+        // 3. Funções de Sistema (Lê do seu localStorage antigo sem perder nada)
+        loadAllData() {
+          this.games.forEach(g => {
+            const lsPity = localStorage.getItem("gt_" + g.id + "_pity");
+            const lsHist = localStorage.getItem("gt_" + g.id + "_history");
+            
+            if (lsPity) this.userData[g.id].pity = JSON.parse(lsPity);
+            if (lsHist) this.userData[g.id].history = JSON.parse(lsHist);
+          });
+        },
+
+        // Troca o jogo na tela e preenche o formulário
+        selectGame(gameId) {
+          this.activeGame = gameId;
+          const pity = this.currentPity;
+          
+          // Preenche os inputs pro usuário editar
+          this.form.char = pity.char || '';
+          this.form.pullPity = pity.pullPity || '';
+          this.form.curPity = pity.curPity || 0;
+          this.form.fifty = pity.fifty || 'W';
+        },
+
+        // 4. Salvar Novo Pull
+        savePull() {
+          const gameId = this.activeGame;
+          const novoPull = {
+            char: this.form.char,
+            pullPity: this.form.pullPity,
+            curPity: this.form.curPity,
+            fifty: this.form.fifty,
+            date: new Date().toLocaleDateString("pt-BR")
+          };
+
+          // Salva na memória do Alpine
+          this.userData[gameId].pity = novoPull;
+          this.userData[gameId].history.unshift(novoPull); // unshift coloca no começo da fila
+
+          // Salva no seu LocalStorage com as exatas mesmas chaves do código velho
+          localStorage.setItem("gt_" + gameId + "_pity", JSON.stringify(novoPull));
+          localStorage.setItem("gt_" + gameId + "_history", JSON.stringify(this.userData[gameId].history));
+
+          alert("Salvo com sucesso!");
+        },
+
+        // Deletar um histórico
+        deleteHistory(index) {
+          if(!confirm("Deletar esse pull?")) return;
+          const gameId = this.activeGame;
+          
+          // Remove da lista
+          this.userData[gameId].history.splice(index, 1);
+          
+          // Se ainda tiver histórico, atualiza o "pity atual" pro anterior
+          if (this.userData[gameId].history.length > 0) {
+            this.userData[gameId].pity = this.userData[gameId].history[0];
+          } else {
+            this.userData[gameId].pity = { curPity: 0 }; // Zerou tudo
+          }
+
+          // Salva no LocalStorage
+          localStorage.setItem("gt_" + gameId + "_history", JSON.stringify(this.userData[gameId].history));
+          localStorage.setItem("gt_" + gameId + "_pity", JSON.stringify(this.userData[gameId].pity));
+        },
+
+        // 5. "Getters" Atalhos práticos
+        get currentGameData() { return this.games.find(g => g.id === this.activeGame); },
+        get currentPity() { return this.userData[this.activeGame].pity; },
+        get currentHistory() { return this.userData[this.activeGame].history; }
+      });
+    });
+  </script>
+</body>
+  </html>
