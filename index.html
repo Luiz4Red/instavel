@@ -10,8 +10,7 @@
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box } html, body { height: 100% }
-    :root { --bg: #080b10; --card: #0f1520; --card2: #131a28; --card3: #0b1019; --border: rgba(80, 160, 255, .13); --border2: rgba(80, 160, 255, .28); --accent: #2e9fff; --accent2: #5bc4ff; --aR: 46; --aG: 159; --aB: 255; --gold: #f0c040; --red: #ff5070; --green: #30e08a; --purple: #b47fff; --text: #ccd6f0; --muted: #4a5878; --muted2: #7080a0; }
-    [data-game="genshin"] { --accent: #c9a227; --accent2: #f0d060; --aR: 201; --aG: 162; --aB: 39; --card: #1a1c10; --card2: #20221a; --card3: #111208; --border: rgba(200, 180, 80, .15); --border2: rgba(240, 200, 60, .32); --text: #e8e0c8; --muted: #6a6040; --muted2: #9a8a60; }[data-game="hsr"] { --accent: #9b59f5; --accent2: #c090ff; --aR: 155; --aG: 89; --aB: 245; --card: #130f1e; --card2: #1a1428; --card3: #0a0810; --border: rgba(160, 100, 255, .15); --border2: rgba(180, 120, 255, .30); --text: #ddd0f8; --muted: #504070; --muted2: #8070a8; }
+    :root { --bg: #080b10; --card: #0f1520; --card2: #131a28; --card3: #0b1019; --border: rgba(80, 160, 255, .13); --border2: rgba(80, 160, 255, .28); --accent: #2e9fff; --accent2: #5bc4ff; --aR: 46; --aG: 159; --aB: 255; --gold: #f0c040; --red: #ff5070; --green: #30e08a; --purple: #b47fff; --text: #ccd6f0; --muted: #4a5878; --muted2: #7080a0; }[data-game="genshin"] { --accent: #c9a227; --accent2: #f0d060; --aR: 201; --aG: 162; --aB: 39; --card: #1a1c10; --card2: #20221a; --card3: #111208; --border: rgba(200, 180, 80, .15); --border2: rgba(240, 200, 60, .32); --text: #e8e0c8; --muted: #6a6040; --muted2: #9a8a60; }[data-game="hsr"] { --accent: #9b59f5; --accent2: #c090ff; --aR: 155; --aG: 89; --aB: 245; --card: #130f1e; --card2: #1a1428; --card3: #0a0810; --border: rgba(160, 100, 255, .15); --border2: rgba(180, 120, 255, .30); --text: #ddd0f8; --muted: #504070; --muted2: #8070a8; }
     [data-game="zzz"] { --accent: #00f5f5; --accent2: #5effff; --aR: 0; --aG: 245; --aB: 245; --card: #0a1111; --card2: #101a1a; --card3: #0a0a0b; --border: rgba(0, 245, 245, 0.15); --border2: rgba(0, 245, 245, 0.30); --text: #e0f8f8; --muted: #484840; --muted2: #888870; }
     [data-game="endfield"] { --accent: #30e08a; --accent2: #60ffaa; --aR: 48; --aG: 224; --aB: 138; --card: #0f1a14; --card2: #142018; --card3: #0a120e; --border: rgba(48, 224, 138, .14); --border2: rgba(60, 240, 150, .30); --text: #cce8d8; --muted: #3a5848; --muted2: #6a9878; }
     body { background: var(--bg); color: var(--text); font-family: "Exo 2", sans-serif; min-height: 100vh; overflow-x: hidden; transition: background .5s, color .5s; }
@@ -134,18 +133,16 @@
               </div>
             </div>
 
-            <!-- LIVE STATUS RESTAURADO -->
+            <!-- LIVE STATUS -->
             <div class="pblock" style="border: 1px solid var(--accent); background: rgba(var(--aR), var(--aG), var(--aB), 0.05);">
                 <div class="pblock-title" style="display: flex; justify-content: space-between;">
                     <span>📡 Status em Tempo Real (Via Nuvem)</span>
                     <span style="opacity: 0.6;" x-text="$store.cloud.lastUpdateText"></span>
                 </div>
                 <div class="stats-grid">
-                    <!-- Suporta resina, stamina e energy do payload -->
                     <div class="sc"><span class="sc-num" x-text="($store.cloud.currentLiveStats?.resin || $store.cloud.currentLiveStats?.stamina || $store.cloud.currentLiveStats?.energy) || '--'"></span><span class="sc-lbl">Resina/Energia</span></div>
-                    <div class="sc"><span class="sc-num" x-text="$store.cloud.currentLiveStats?.daily || '--'" :class="{'c-g': $store.cloud.currentLiveStats?.daily?.includes('4/4') || $store.cloud.currentLiveStats?.daily?.includes('500/500')}"></span><span class="sc-lbl">Missões Diárias</span></div>
+                    <div class="sc"><span class="sc-num" x-text="$store.cloud.currentLiveStats?.daily || '--'" :class="{'c-g': $store.cloud.currentLiveStats?.daily?.includes('4/4') || $store.cloud.currentLiveStats?.daily?.includes('500/500') || $store.cloud.currentLiveStats?.daily?.includes('400/400')}"></span><span class="sc-lbl">Missões Diárias</span></div>
                 </div>
-                <!-- Botão que aciona o /run do backend e faz countdown de 30s -->
                 <button class="btn-small" @click="$store.cloud.forceLiveUpdate()" :disabled="$store.cloud.isFetching" style="border-color: var(--accent); color: var(--accent2);">
                     <span x-text="$store.cloud.syncBtnText"></span>
                 </button>
@@ -202,7 +199,7 @@
                             <div class="timeline-line" :style="'width:' + (h.pullPity * 3) + 'px;'"></div>
                             <div class="timeline-node">
                                 <span class="timeline-pity" :class="$store.tracker.getTimelineColor(h.fifty)" x-text="h.pullPity"></span>
-                                <img :src="$store.app.getCharIcon(h.char)" class="timeline-img" :class="$store.tracker.getTimelineColor(h.fifty)" :title="h.char">
+                                <img :src="$store.app.getCharIcon(h.char)" class="timeline-img" :class="$store.tracker.getTimelineColor(h.fifty)" :title="h.char" onerror="this.src='https://placehold.co/44x44/131a28/7080a0?text=?'">
                                 <div class="timeline-point" :class="$store.tracker.getTimelineBgColor(h.fifty)"></div>
                                 <span class="timeline-name" x-text="h.char"></span>
                             </div>
@@ -234,7 +231,7 @@
                 <div x-show="$store.banners.isLoading" style="color:var(--muted2)">Carregando...</div>
                 <template x-for="char in $store.banners.currentLive" :key="char.name">
                   <div class="bchar">
-                    <img :src="char.icon" :alt="char.name" onerror="this.src='https://via.placeholder.com/64'">
+                    <img :src="char.icon" :alt="char.name" onerror="this.src='https://placehold.co/64x64/131a28/7080a0?text=?'">
                     <div><div class="bchar-name" x-text="char.name"></div><div style="color: #f5c800; font-size: .75rem;">★★★★★</div><span class="bbadge">5★ · Banner Atual</span></div>
                   </div>
                 </template>
@@ -245,7 +242,7 @@
                <div x-show="$store.banners.isLoading" style="color:var(--muted2)">Aguardando dados...</div>
                <template x-for="char in $store.banners.currentFuture" :key="char.name">
                   <div class="future-char">
-                      <img :src="char.icon || $store.app.getCharIcon(char.name)" class="future-char-icon" onerror="this.src='https://via.placeholder.com/50'">
+                      <img :src="char.icon || $store.app.getCharIcon(char.name)" class="future-char-icon" onerror="this.src='https://placehold.co/50x50/131a28/7080a0?text=?'">
                       <div class="future-char-info">
                           <div class="future-char-header"><span class="future-char-name" x-text="char.name"></span><span class="future-badge" :class="char.rerun ? 'rerun' : 'new'" x-text="char.rerun ? 'Rerun' : 'Novo'"></span></div>
                           <div class="future-char-traits"><template x-for="trait in char.traits"><img :src="trait" class="future-trait-icon" onerror="this.style.display='none'"></template></div>
@@ -323,7 +320,6 @@
           <div class="pe-grp"><label class="pe-lbl">ltoken_v2</label><input type="password" class="pe-inp" x-model="$store.cloud.ltoken" :disabled="$store.cloud.locked"></div>
         </div>
 
-        <!-- UIDs VOLTARAM AQUI -->
         <div class="pblock-title">Identificadores de Jogo (UID)</div>
         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom: 20px;">
           <div class="pe-grp"><label class="pe-lbl">Genshin</label><input type="text" class="pe-inp" placeholder="Opcional" x-model="$store.cloud.uidGs" :disabled="$store.cloud.locked"></div>
@@ -353,13 +349,25 @@
             this.activeGame = id; Alpine.store('tracker').prefillForm(); Alpine.store('countdown').loadFor(id);
             if(this.activeTab === 'banner') Alpine.store('banners').fetchData(false);
         },
+        // Correção 2: Sistema de Fallback de Proxies para não ser bloqueado pela Vercel/CORS
         async fetchCharDb() {
-            try {
-                const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vTm5Kk3LdPMBgYh17C6PQrRX_xI1G6KG8xv2Ubh9GhfKjBzig0oaJUZZ7P5BDy0-Eh1Lm4icCiYQeYr/pub?output=csv"));
-                if(res.ok) { const lines = (await res.text()).split('\n'); for(let i=1; i<lines.length; i++) { const p = lines[i].split(',').map(x=>x.replace(/^"|"$/g,"").trim()); if(p[1]&&p[2]) this.charDb[p[1].toLowerCase()] = p[2]; } }
-            } catch(e) {}
+            const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm5Kk3LdPMBgYh17C6PQrRX_xI1G6KG8xv2Ubh9GhfKjBzig0oaJUZZ7P5BDy0-Eh1Lm4icCiYQeYr/pub?output=csv";
+            const proxies =[ u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) ];
+            for (let getUrl of proxies) {
+                try {
+                    const res = await fetch(getUrl(csvUrl));
+                    if(res.ok) { 
+                        const lines = (await res.text()).split('\n'); 
+                        for(let i=1; i<lines.length; i++) { 
+                            const p = lines[i].split(',').map(x=>x.replace(/^"|"$/g,"").trim()); 
+                            if(p[1]&&p[2]) this.charDb[p[1].toLowerCase()] = p[2]; 
+                        } 
+                        break; // Sucesso, sai do loop
+                    }
+                } catch(e) {}
+            }
         },
-        getCharIcon(name) { return this.charDb[(name||'').toLowerCase()] || 'https://via.placeholder.com/44?text=?'; }
+        getCharIcon(name) { return this.charDb[(name||'').toLowerCase()] || 'https://placehold.co/44x44/131a28/7080a0?text=?'; }
       });
 
       Alpine.store('tracker', {
@@ -368,7 +376,7 @@
         init() { Alpine.store('app').games.forEach(g => { const p=localStorage.getItem("gt_"+g.id+"_pity"); const h=localStorage.getItem("gt_"+g.id+"_history"); if(p) this.userData[g.id].pity=JSON.parse(p); if(h) this.userData[g.id].history=JSON.parse(h); }); },
         get currentPity() { return this.userData[Alpine.store('app').activeGame]?.pity; },
         get currentHistory() { return this.userData[Alpine.store('app').activeGame]?.history ||[]; },
-        get reversedHistory() { return [...this.currentHistory].reverse(); },
+        get reversedHistory() { return[...this.currentHistory].reverse(); },
         get progressPercent() { const g = Alpine.store('app').currentGameObj; return Math.min(100, Math.round(((this.currentPity?.curPity||0)/(g?.max||90))*100)); },
         get progressColor() { const g = Alpine.store('app').currentGameObj; return (this.currentPity?.curPity||0)>=(g?.soft||74) ? 'var(--gold)' : 'var(--accent)'; },
         get averagePity() { if(!this.currentHistory.length) return 0; return (this.currentHistory.reduce((a, b) => a+(b.pullPity||0), 0)/this.currentHistory.length).toFixed(1); },
@@ -380,13 +388,13 @@
           const id = Alpine.store('app').activeGame; const pull = { char: this.form.char, pullPity: parseInt(this.form.pullPity), curPity: parseInt(this.form.curPity), fifty: this.form.fifty, date: new Date().toLocaleDateString("pt-BR") };
           this.userData[id].pity = pull; if(push) this.userData[id].history.unshift(pull);
           localStorage.setItem("gt_"+id+"_pity", JSON.stringify(pull)); localStorage.setItem("gt_"+id+"_history", JSON.stringify(this.userData[id].history));
-          Alpine.store('monthly').calculate(); Alpine.store('cloud').silentlySaveToCloud(); // Auto-save
+          Alpine.store('monthly').calculate(); Alpine.store('cloud').silentlySaveToCloud();
         },
         deleteHistory(index) {
           const id = Alpine.store('app').activeGame; this.userData[id].history.splice(index, 1);
           this.userData[id].pity = this.userData[id].history.length>0 ? this.userData[id].history[0] : { curPity: 0 };
           localStorage.setItem("gt_"+id+"_history", JSON.stringify(this.userData[id].history)); localStorage.setItem("gt_"+id+"_pity", JSON.stringify(this.userData[id].pity));
-          this.prefillForm(); Alpine.store('monthly').calculate(); Alpine.store('cloud').silentlySaveToCloud(); // Auto-save
+          this.prefillForm(); Alpine.store('monthly').calculate(); Alpine.store('cloud').silentlySaveToCloud();
         },
         getColorClass(v) { return v<50 ? "c-g" : v<=70 ? "c-y" : "c-r"; }, getFiftyColor(v) { return v==='W'?'var(--green)':v==='G'?'var(--gold)':'var(--red)'; }, getFiftyLabel(v) { return v==='W'?'W (Ganhou)':v==='G'?'G (Garantido)':v==='L'?'L (Perdeu)':'—'; }, getTimelineColor(v) { return v==='W'?'tl-W':v==='L'?'tl-L':'tl-G'; }, getTimelineBgColor(v) { return v==='W'?'tl-bg-W':v==='L'?'tl-bg-L':'tl-bg-G'; }
       });
@@ -415,27 +423,34 @@
              const unq=[]; const sn=new Set(); ch.forEach(c=>{if(!sn.has(c.name)){sn.add(c.name);unq.push(c);}});
              this.liveData[id]=unq; localStorage.setItem(kL, JSON.stringify({time: Date.now(), items: unq}));
           } catch(e) {}
-          try {
-             const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent("https://docs.google.com/spreadsheets/d/e/2PACX-1vRbrSRKrBSYS2JrFdRmx6HZOM0LgaWX5YStUUXbaKkVhlCqDyK1GmKHRw_vfvJQpO0aDZW1quGLZYMy/pub?output=csv"));
-             if(res.ok) {
-                 const lines = (await res.text()).split('\n'); let f = {genshin:[], hsr:[], zzz:[], endfield:[]};
-                 for(let i=1; i<lines.length; i++) { let p = lines[i].split(',').map(x=>x.replace(/^"|"$/g,"").trim()); if(p[0])f.genshin.push({name:p[0],icon:p[1],traits:[p[2],p[3]],ver:p[4],rerun:p[5]==="TRUE"}); if(p[7])f.hsr.push({name:p[7],icon:p[8],traits:[p[9],p[10]],ver:p[11],rerun:p[12]==="TRUE"}); if(p[14])f.zzz.push({name:p[14],icon:p[15],traits:[p[16],p[17]],ver:p[18],rerun:p[19]==="TRUE"}); if(p[21])f.endfield.push({name:p[21],icon:p[22],traits:[p[23],p[24],p[25]],ver:p[26],rerun:p[27]==="TRUE"}); }
-                 Object.keys(f).forEach(k => { this.futureData[k]=f[k]; localStorage.setItem(`gt_future_${k}`, JSON.stringify({time: Date.now(), items: f[k]})); });
-             }
-          } catch(e) {} this.isLoading = false;
+          
+          // Correção 2: Fallback Banners Futuros
+          const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbrSRKrBSYS2JrFdRmx6HZOM0LgaWX5YStUUXbaKkVhlCqDyK1GmKHRw_vfvJQpO0aDZW1quGLZYMy/pub?output=csv";
+          const proxies =[ u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) ];
+          for(let getUrl of proxies) {
+              try {
+                  const res = await fetch(getUrl(csvUrl));
+                  if(res.ok) {
+                      const lines = (await res.text()).split('\n'); let f = {genshin:[], hsr:[], zzz:[], endfield:[]};
+                      for(let i=1; i<lines.length; i++) { let p = lines[i].split(',').map(x=>x.replace(/^"|"$/g,"").trim()); if(p[0])f.genshin.push({name:p[0],icon:p[1],traits:[p[2],p[3]],ver:p[4],rerun:p[5]==="TRUE"}); if(p[7])f.hsr.push({name:p[7],icon:p[8],traits:[p[9],p[10]],ver:p[11],rerun:p[12]==="TRUE"}); if(p[14])f.zzz.push({name:p[14],icon:p[15],traits:[p[16],p[17]],ver:p[18],rerun:p[19]==="TRUE"}); if(p[21])f.endfield.push({name:p[21],icon:p[22],traits:[p[23],p[24],p[25]],ver:p[26],rerun:p[27]==="TRUE"}); }
+                      Object.keys(f).forEach(k => { this.futureData[k]=f[k]; localStorage.setItem(`gt_future_${k}`, JSON.stringify({time: Date.now(), items: f[k]})); });
+                      break; // Sucesso, sai do loop
+                  }
+              } catch(e) {}
+          }
+          this.isLoading = false;
         }
       });
 
       Alpine.store('cloud', {
         syncId: localStorage.getItem('gt_sync_label') || '', 
-        ltuid: '', ltoken: '', uidGs: '', uidHsr: '', uidZzz: '', // UIDs restaurados
+        ltuid: '', ltoken: '', uidGs: '', uidHsr: '', uidZzz: '',
         locked: !!localStorage.getItem('gt_sync_label'),
         statusMsg: '', statusColor: 'var(--muted2)',
         isFetching: false, liveDataCache: null, lastFetchTime: 0,
         syncBtnText: 'Sincronizar Conta Agora',
         
         async init() {
-            // Busca dados da nuvem ao abrir o site para preencher os inputs se existirem
             if(this.syncId) {
                 try {
                     const res = await fetch(`https://gacha-tracker-priv.onrender.com/data/${encodeURIComponent(this.syncId)}`);
@@ -451,18 +466,13 @@
         get lastUpdateText() { if(this.lastFetchTime===0) return "Nunca sincronizado"; const d = new Date(this.lastFetchTime); return `Visto às ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; },
         get currentLiveStats() { const g = Alpine.store('app').currentGameObj; return g?.apiCode ? this.liveDataCache?.[g.apiCode] : null; },
         
-        // Salva os dados *de verdade* no servidor do Render!
         async performSync() {
             if(!this.syncId) return;
             this.statusMsg = "Enviando dados para o servidor..."; this.statusColor = "var(--gold)";
             const siteDataObj = {};
             Object.keys(localStorage).filter(k => k.startsWith('gt_') && k !== 'gt_sync_label').forEach(k => siteDataObj[k] = localStorage.getItem(k));
             
-            const payload = {
-                ltuid_v2: this.ltuid, ltoken_v2: this.ltoken,
-                uid_gs: this.uidGs, uid_hsr: this.uidHsr, uid_zzz: this.uidZzz,
-                siteData: JSON.stringify(siteDataObj)
-            };
+            const payload = { ltuid_v2: this.ltuid, ltoken_v2: this.ltoken, uid_gs: this.uidGs, uid_hsr: this.uidHsr, uid_zzz: this.uidZzz, siteData: JSON.stringify(siteDataObj) };
 
             try {
                 await fetch(`https://gacha-tracker-priv.onrender.com/save/${encodeURIComponent(this.syncId)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -472,25 +482,24 @@
         },
 
         async silentlySaveToCloud() {
-            if(!this.syncId || !this.locked) return; // Só auto-salva se o usuário já validou e trancou
+            if(!this.syncId || !this.locked) return;
             const siteDataObj = {};
             Object.keys(localStorage).filter(k => k.startsWith('gt_') && k !== 'gt_sync_label').forEach(k => siteDataObj[k] = localStorage.getItem(k));
             const payload = { ltuid_v2: this.ltuid, ltoken_v2: this.ltoken, uid_gs: this.uidGs, uid_hsr: this.uidHsr, uid_zzz: this.uidZzz, siteData: JSON.stringify(siteDataObj) };
             try { await fetch(`https://gacha-tracker-priv.onrender.com/save/${encodeURIComponent(this.syncId)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch(e) {}
         },
 
-        // Função que aciona o crawler do servidor e espera 30 segundos igual no original
         async forceLiveUpdate() {
             if(!this.syncId || !Alpine.store('app').currentGameObj?.apiCode) return;
             this.isFetching = true; this.syncBtnText = "Solicitando ao Servidor...";
             try {
-                await fetch('https://gacha-tracker-priv.onrender.com/run'); // Dispara o seu crawler no backend
+                await fetch('https://gacha-tracker-priv.onrender.com/run'); 
                 let secs = 30;
                 const timer = setInterval(() => {
                     secs--; this.syncBtnText = `Aguarde (${secs}s)...`;
                     if(secs <= 0) {
                         clearInterval(timer); this.syncBtnText = "Sincronizar Conta Agora";
-                        this.isFetching = false; this.fetchLiveStatus(true); // Puxa os dados após o crawler rodar
+                        this.isFetching = false; this.fetchLiveStatus(true); 
                     }
                 }, 1000);
             } catch(e) {
@@ -499,10 +508,9 @@
             }
         },
 
-        // Função padrão que lê o JSON cacheado do servidor Render (sem disparar o crawler pesado)
         async fetchLiveStatus(force=false) {
             if(!this.syncId || !Alpine.store('app').currentGameObj?.apiCode) return;
-            if(!force && (Date.now() - this.lastFetchTime < 600000)) return; // Usa cache da memória se < 10min
+            if(!force && (Date.now() - this.lastFetchTime < 600000)) return;
             try {
                 const res = await fetch(`https://gacha-tracker-priv.onrender.com/data/${encodeURIComponent(this.syncId)}`);
                 const data = await res.json();
@@ -510,7 +518,6 @@
             } catch(e) {}
         },
 
-        // JSON BACKUPS Locais (Aba Salvar & Nuvem)
         exportData() { const obj = {}; Object.keys(localStorage).filter(k => k.startsWith("gt_")).forEach(k => obj[k.slice(3)] = JSON.parse(localStorage.getItem(k))); const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" })); a.download = "gacha-tracker-backup.json"; a.click(); URL.revokeObjectURL(a.href); },
         importData(e) { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = ev => { try { Object.entries(JSON.parse(ev.target.result)).forEach(([k, v]) => localStorage.setItem("gt_" + k, JSON.stringify(v))); alert("Importado! A página vai recarregar."); location.reload(); } catch { alert("Erro de JSON."); } }; r.readAsText(file); e.target.value = ""; }
       });
