@@ -349,21 +349,36 @@
             this.activeGame = id; Alpine.store('tracker').prefillForm(); Alpine.store('countdown').loadFor(id);
             if(this.activeTab === 'banner') Alpine.store('banners').fetchData(false);
         },
-        // Correção 2: Sistema de Fallback de Proxies para não ser bloqueado pela Vercel/CORS
+        
+        // RESTAURADO: Leitura Bruta e à prova de falhas do seu código original
         async fetchCharDb() {
             const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm5Kk3LdPMBgYh17C6PQrRX_xI1G6KG8xv2Ubh9GhfKjBzig0oaJUZZ7P5BDy0-Eh1Lm4icCiYQeYr/pub?output=csv";
             const proxies =[ u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) ];
+            
             for (let getUrl of proxies) {
                 try {
                     const res = await fetch(getUrl(csvUrl));
-                    if(res.ok) { 
-                        const lines = (await res.text()).split('\n'); 
-                        for(let i=1; i<lines.length; i++) { 
-                            const p = lines[i].split(',').map(x=>x.replace(/^"|"$/g,"").trim()); 
-                            if(p[1]&&p[2]) this.charDb[p[1].toLowerCase()] = p[2]; 
-                        } 
-                        break; // Sucesso, sai do loop
+                    if(!res.ok) continue;
+                    const text = await res.text();
+                    const lines = text.split('\n');
+                    
+                    for(let i = 1; i < lines.length; i++) {
+                        const row = lines[i];
+                        if(!row) continue;
+                        let parts =[], cur = "", inQ = false;
+                        for(let c of row) {
+                            if(c === '"') inQ = !inQ;
+                            else if(c === ',' && !inQ) { parts.push(cur.trim()); cur = ""; }
+                            else cur += c;
+                        }
+                        parts.push(cur.trim());
+                        parts = parts.map(p => p.replace(/^"|"$/g, "").trim());
+                        
+                        if(parts.length >= 3 && parts[1] && parts[2]) {
+                            this.charDb[parts[1].toLowerCase()] = parts[2];
+                        }
                     }
+                    break; // Deu certo, para de tentar outros proxies
                 } catch(e) {}
             }
         },
@@ -376,7 +391,7 @@
         init() { Alpine.store('app').games.forEach(g => { const p=localStorage.getItem("gt_"+g.id+"_pity"); const h=localStorage.getItem("gt_"+g.id+"_history"); if(p) this.userData[g.id].pity=JSON.parse(p); if(h) this.userData[g.id].history=JSON.parse(h); }); },
         get currentPity() { return this.userData[Alpine.store('app').activeGame]?.pity; },
         get currentHistory() { return this.userData[Alpine.store('app').activeGame]?.history ||[]; },
-        get reversedHistory() { return[...this.currentHistory].reverse(); },
+        get reversedHistory() { return [...this.currentHistory].reverse(); },
         get progressPercent() { const g = Alpine.store('app').currentGameObj; return Math.min(100, Math.round(((this.currentPity?.curPity||0)/(g?.max||90))*100)); },
         get progressColor() { const g = Alpine.store('app').currentGameObj; return (this.currentPity?.curPity||0)>=(g?.soft||74) ? 'var(--gold)' : 'var(--accent)'; },
         get averagePity() { if(!this.currentHistory.length) return 0; return (this.currentHistory.reduce((a, b) => a+(b.pullPity||0), 0)/this.currentHistory.length).toFixed(1); },
@@ -409,13 +424,23 @@
       Alpine.store('banners', {
         isLoading: false, liveData: {}, futureData: {},
         get currentLive() { return this.liveData[Alpine.store('app').activeGame]||[]; }, get currentFuture() { return this.futureData[Alpine.store('app').activeGame]||[]; },
+        
         async fetchData(force) {
           const id = Alpine.store('app').activeGame; if(!id) return;
           const kL = `gt_live_${id}`; const kF = `gt_future_${id}`;
-          if (!force && localStorage.getItem(kL) && localStorage.getItem(kF) && (Date.now()-JSON.parse(localStorage.getItem(kL)).time<43200000)) {
-             this.liveData[id] = JSON.parse(localStorage.getItem(kL)).items; this.futureData[id] = JSON.parse(localStorage.getItem(kF)).items; return;
+          
+          if (!force && localStorage.getItem(kL) && localStorage.getItem(kF)) {
+            const cacheObj = JSON.parse(localStorage.getItem(kL));
+            if (Date.now() - cacheObj.time < 43200000) {
+               this.liveData[id] = cacheObj.items; 
+               this.futureData[id] = JSON.parse(localStorage.getItem(kF)).items; 
+               return;
+            }
           }
+          
           this.isLoading = true;
+          
+          // FETCH: BANNERS ATUAIS (API Ennead)
           try {
              let ch=[];
              if(id==='genshin'){ const d=await(await fetch("https://api.ennead.cc/mihoyo/genshin/calendar")).json(); d.banners?.forEach(b=>b.characters?.forEach(c=>{if(c.rarity===5)ch.push(c);})); }
@@ -424,18 +449,43 @@
              this.liveData[id]=unq; localStorage.setItem(kL, JSON.stringify({time: Date.now(), items: unq}));
           } catch(e) {}
           
-          // Correção 2: Fallback Banners Futuros
+          // RESTAURADO: FETCH BANNERS FUTUROS (Google Sheets)
           const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbrSRKrBSYS2JrFdRmx6HZOM0LgaWX5YStUUXbaKkVhlCqDyK1GmKHRw_vfvJQpO0aDZW1quGLZYMy/pub?output=csv";
           const proxies =[ u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) ];
+          
           for(let getUrl of proxies) {
               try {
                   const res = await fetch(getUrl(csvUrl));
-                  if(res.ok) {
-                      const lines = (await res.text()).split('\n'); let f = {genshin:[], hsr:[], zzz:[], endfield:[]};
-                      for(let i=1; i<lines.length; i++) { let p = lines[i].split(',').map(x=>x.replace(/^"|"$/g,"").trim()); if(p[0])f.genshin.push({name:p[0],icon:p[1],traits:[p[2],p[3]],ver:p[4],rerun:p[5]==="TRUE"}); if(p[7])f.hsr.push({name:p[7],icon:p[8],traits:[p[9],p[10]],ver:p[11],rerun:p[12]==="TRUE"}); if(p[14])f.zzz.push({name:p[14],icon:p[15],traits:[p[16],p[17]],ver:p[18],rerun:p[19]==="TRUE"}); if(p[21])f.endfield.push({name:p[21],icon:p[22],traits:[p[23],p[24],p[25]],ver:p[26],rerun:p[27]==="TRUE"}); }
-                      Object.keys(f).forEach(k => { this.futureData[k]=f[k]; localStorage.setItem(`gt_future_${k}`, JSON.stringify({time: Date.now(), items: f[k]})); });
-                      break; // Sucesso, sai do loop
+                  if(!res.ok) continue;
+                  const text = await res.text();
+                  const lines = text.replace(/\r/g, "").split('\n'); 
+                  let f = {genshin:[], hsr:[], zzz:[], endfield:[]};
+                  
+                  for(let i=1; i<lines.length; i++) {
+                      if(!lines[i].trim()) continue;
+                      let parts =[], cur = "", inQ = false;
+                      for(let c of lines[i]) {
+                          if(c === '"') inQ = !inQ;
+                          else if(c === ',' && !inQ) { parts.push(cur.trim()); cur = ""; }
+                          else cur += c;
+                      }
+                      parts.push(cur.trim());
+                      parts = parts.map(p => p.replace(/^"|"$/g, "").trim());
+                      
+                      // Preenche até 28 posições para evitar erros de array index out of bounds
+                      while(parts.length < 28) parts.push(""); 
+                      
+                      if(parts[0]) f.genshin.push({name:parts[0], icon:parts[1], traits:[parts[2],parts[3]], ver:parts[4], rerun:parts[5].toUpperCase()==="TRUE"});
+                      if(parts[7]) f.hsr.push({name:parts[7], icon:parts[8], traits:[parts[9],parts[10]], ver:parts[11], rerun:parts[12].toUpperCase()==="TRUE"});
+                      if(parts[14]) f.zzz.push({name:parts[14], icon:parts[15], traits:[parts[16],parts[17]], ver:parts[18], rerun:parts[19].toUpperCase()==="TRUE"});
+                      if(parts[21]) f.endfield.push({name:parts[21], icon:parts[22], traits:[parts[23],parts[24],parts[25]], ver:parts[26], rerun:parts[27].toUpperCase()==="TRUE"});
                   }
+                  
+                  Object.keys(f).forEach(k => { 
+                      this.futureData[k] = f[k]; 
+                      localStorage.setItem(`gt_future_${k}`, JSON.stringify({time: Date.now(), items: f[k]})); 
+                  });
+                  break; // Deu certo, sai do proxy loop
               } catch(e) {}
           }
           this.isLoading = false;
@@ -531,7 +581,7 @@
             Alpine.store('app').games.forEach(game => {
                 const hist = JSON.parse(localStorage.getItem("gt_" + game.id + "_history")||"[]"); let gW=0, gL=0;
                 hist.forEach(h => {
-                    if(!h.date) return; const [day, month, year] = h.date.split("/");
+                    if(!h.date) return; const[day, month, year] = h.date.split("/");
                     if(parseInt(month)===m && parseInt(year)===y) {
                         t5++; pts.push(h.pullPity||0); if((h.pullPity||0)>maxP) maxP=h.pullPity;
                         if(h.fifty==='W'){ w++; gW++; } else if(h.fifty==='L'){ l++; gL++; } else if(h.fifty==='G') g++;
