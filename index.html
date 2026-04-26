@@ -1814,7 +1814,6 @@
           site_data: siteDataObj
         });
 
-        if (!error) console.log("☁️ Backup Local-First salvo na nuvem!");
       }, 2000);
     }
 
@@ -1860,10 +1859,8 @@
       if (supabaseClient) {
         // Isso aqui vai avisar no seu F12 (Console) tudo o que o Supabase está tentando fazer
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
-          console.log("🔄 Evento de Login disparado:", event);
 
           if (session?.user) {
-            console.log("✅ Usuário reconhecido:", session.user.email);
             const isNewLogin = (!currentUser);
             currentUser = session.user;
 
@@ -1871,7 +1868,6 @@
 
             if (isNewLogin) await syncFromSupabase();
           } else {
-            console.log("❌ Nenhum usuário logado encontrado.");
             currentUser = null;
             updateAuthUI(null);
           }
