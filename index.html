@@ -1,608 +1,3008 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Gacha Tracker - Complete Edition</title>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-  
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+  <title>Gacha Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800;900&display=swap"
+    rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box } html, body { height: 100% }
-    :root { --bg: #080b10; --card: #0f1520; --card2: #131a28; --card3: #0b1019; --border: rgba(80, 160, 255, .13); --border2: rgba(80, 160, 255, .28); --accent: #2e9fff; --accent2: #5bc4ff; --aR: 46; --aG: 159; --aB: 255; --gold: #f0c040; --red: #ff5070; --green: #30e08a; --purple: #b47fff; --text: #ccd6f0; --muted: #4a5878; --muted2: #7080a0; }[data-game="genshin"] { --accent: #c9a227; --accent2: #f0d060; --aR: 201; --aG: 162; --aB: 39; --card: #1a1c10; --card2: #20221a; --card3: #111208; --border: rgba(200, 180, 80, .15); --border2: rgba(240, 200, 60, .32); --text: #e8e0c8; --muted: #6a6040; --muted2: #9a8a60; }[data-game="hsr"] { --accent: #9b59f5; --accent2: #c090ff; --aR: 155; --aG: 89; --aB: 245; --card: #130f1e; --card2: #1a1428; --card3: #0a0810; --border: rgba(160, 100, 255, .15); --border2: rgba(180, 120, 255, .30); --text: #ddd0f8; --muted: #504070; --muted2: #8070a8; }
-    [data-game="zzz"] { --accent: #00f5f5; --accent2: #5effff; --aR: 0; --aG: 245; --aB: 245; --card: #0a1111; --card2: #101a1a; --card3: #0a0a0b; --border: rgba(0, 245, 245, 0.15); --border2: rgba(0, 245, 245, 0.30); --text: #e0f8f8; --muted: #484840; --muted2: #888870; }
-    [data-game="endfield"] { --accent: #30e08a; --accent2: #60ffaa; --aR: 48; --aG: 224; --aB: 138; --card: #0f1a14; --card2: #142018; --card3: #0a120e; --border: rgba(48, 224, 138, .14); --border2: rgba(60, 240, 150, .30); --text: #cce8d8; --muted: #3a5848; --muted2: #6a9878; }
-    body { background: var(--bg); color: var(--text); font-family: "Exo 2", sans-serif; min-height: 100vh; overflow-x: hidden; transition: background .5s, color .5s; }
-    body::before { content: ""; position: fixed; inset: 0; background-image: linear-gradient(rgba(var(--aR), var(--aG), var(--aB), .03) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--aR), var(--aG), var(--aB), .03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
-    body::after { content: ""; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 20% 20%, rgba(var(--aR), var(--aG), var(--aB), .12) 0%, transparent 60%), radial-gradient(ellipse 60% 60% at 80% 80%, rgba(var(--aR), var(--aG), var(--aB), .09) 0%, transparent 60%); pointer-events: none; z-index: 0; transition: background .5s; }
-    .topnav { position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 200; background: rgba(8, 11, 16, .93); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); display: flex; align-items: center; transition: border-color .4s; }
-    .nav-logo { display: flex; align-items: center; gap: 9px; padding: 0 18px; border-right: 1px solid var(--border); height: 100%; flex-shrink: 0; }
-    .nav-logo-icon { width: 26px; height: 26px; border: 1.5px solid var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(var(--aR), var(--aG), var(--aB), .25); transition: border-color .4s, box-shadow .4s; }
-    .nav-logo-text { font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: .85rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text); }
-    .nav-tabs { display: flex; align-items: stretch; height: 100%; flex: 1; overflow-x: auto; scrollbar-width: none; }
-    .nav-tab { display: flex; align-items: center; gap: 7px; padding: 0 15px; cursor: pointer; font-family: "Rajdhani", sans-serif; font-weight: 600; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted2); border-bottom: 2px solid transparent; transition: color .2s, border-color .2s, background .2s; white-space: nowrap; user-select: none; }
-    .nav-tab:hover { color: var(--text); background: rgba(var(--aR), var(--aG), var(--aB), .05); } .nav-tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
-    .page { display: none; position: relative; z-index: 2; padding-top: 52px; min-height: 100vh; } .page.active { display: block; }
-    .tracker-layout { display: flex; min-height: calc(100vh - 52px); }
-    .cards-rail { width: 190px; flex-shrink: 0; padding: 20px 14px; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid rgba(255, 255, 255, 0.05); position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto; background: rgba(8, 11, 16, 0.4) !important; backdrop-filter: blur(10px); z-index: 10; }
-    .game-card { border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1) !important; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; background: rgba(255, 255, 255, 0.03) !important; opacity: 0.5; }
-    .game-card:hover { opacity: 0.9; transform: translateY(-3px); background: rgba(255, 255, 255, 0.1) !important; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); } .game-card.active { opacity: 1; background: rgba(var(--aR), var(--aG), var(--aB), 0.15) !important; border-color: var(--accent) !important; box-shadow: 0 0 15px rgba(var(--aR), var(--aG), var(--aB), 0.2); }
-    .game-card img { width: 100%; height: 100px; object-fit: cover; display: block; filter: brightness(.72); transition: filter .3s; } .game-card:hover img, .game-card.active img { filter: brightness(1); }
-    .game-card-name { position: absolute; bottom: 0; left: 0; right: 0; padding: 5px 8px 6px; background: linear-gradient(transparent, rgba(0, 0, 0, .82)); font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: .72rem; letter-spacing: .07em; color: #fff; text-transform: uppercase; }
-    .main-panel { flex: 1; min-width: 0; padding: 22px 26px 48px; overflow-y: auto; position: relative; } .main-panel > *:not(#main-panel-bg) { position: relative; z-index: 1; }
-    .welcome-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; gap: 12px; position: relative; z-index: 1; } .welcome-title { font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: 1.5rem; letter-spacing: .1em; color: var(--muted2); }
-    .gp-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; } .gp-icon { width: 42px; height: 42px; border-radius: 9px; border: 1.5px solid var(--accent); overflow: hidden; flex-shrink: 0; box-shadow: 0 0 12px rgba(var(--aR), var(--aG), var(--aB), .22); } .gp-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .gp-title { font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: 1.35rem; letter-spacing: .07em; color: var(--text); } .game-sub-nav { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-    .sub-tab-btn { background: transparent; border: none; color: var(--muted2); font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 16px; cursor: pointer; border-radius: 8px; transition: all 0.2s; border: 1px solid transparent; } .sub-tab-btn:hover { color: var(--text); background: rgba(var(--aR), var(--aG), var(--aB), 0.08); } .sub-tab-btn.active { color: var(--accent2); background: rgba(var(--aR), var(--aG), var(--aB), 0.15); border-color: var(--accent); box-shadow: 0 0 10px rgba(var(--aR), var(--aG), var(--aB), 0.15); }
-    .pblock { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; transition: background .4s, border-color .4s; } .pblock-title { font-size: .6rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted2); margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
-    .btn-small { width: 100%; background: transparent; border: 1px solid var(--border2); border-radius: 6px; color: var(--muted2); font-family: "Exo 2", sans-serif; font-size: .65rem; text-transform: uppercase; padding: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 9px; transition: .2s; } .btn-small:hover { background: rgba(var(--aR), var(--aG), var(--aB), .07); color: var(--accent2); border-color: var(--accent); }
-    .pe-inp { background: var(--card2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 8px 9px; outline: none; width: 100%; font-family: "Exo 2"; } .pe-lbl { font-size: .58rem; text-transform: uppercase; color: var(--muted2); }
-    .btn-post { flex: 1; background: linear-gradient(135deg, rgba(var(--aR), var(--aG), var(--aB), .55), rgba(var(--aR), var(--aG), var(--aB), 1)); border: none; border-radius: 7px; color: #fff; font-family: "Rajdhani"; font-weight: 700; font-size: .8rem; padding: 10px; cursor: pointer; text-transform: uppercase;} .btn-edit { flex: 1; background: transparent; border: 1px solid var(--border2); border-radius: 7px; color: var(--muted2); font-family: "Rajdhani"; font-weight: 600; padding: 10px; cursor: pointer; text-transform: uppercase; }
-    .pity-cells { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 10px; } .pc { background: var(--card2); border: 1px solid var(--border); border-radius: 9px; padding: 9px 5px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 3px; } .pc-lbl { font-size: .5rem; text-transform: uppercase; color: var(--muted2); } .pc-val { font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: 1.4rem; line-height: 1; } .pc-val.sm { font-size: .82rem; line-height: 1.3; }
-    .pbar-wrap { margin-top: 2px; } .pbar-hdr { display: flex; justify-content: space-between; font-size: .58rem; color: var(--muted2); margin-bottom: 4px; } .pbar-hdr span { color: var(--accent2); font-weight: 600; } .pbar-bg { height: 4px; background: rgba(255, 255, 255, .07); border-radius: 3px; overflow: hidden; } .pbar-fill { height: 100%; border-radius: 3px; transition: width .7s ease, background .4s; }
-    .pity-toggle-row { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; } .pity-toggle-line { flex: 1; height: 1px; background: var(--border); } .btn-toggle-pity { display: flex; align-items: center; gap: 7px; background: var(--card); border: 1px solid var(--border2); border-radius: 8px; color: var(--muted2); font-family: "Exo 2", sans-serif; font-size: .7rem; text-transform: uppercase; padding: 7px 16px; cursor: pointer; transition: .2s; }
-    .pull-collapsible { overflow: hidden; max-height: 0; transition: max-height .4s cubic-bezier(.4, 0, .2, 1), opacity .3s; opacity: 0; } .pull-collapsible.open { max-height: 700px; opacity: 1; } .pull-wrap { background: var(--card3); border: 1px solid var(--border); border-radius: 10px; padding: 13px 14px; margin-bottom: 15px;} .pe-grp { display: flex; flex-direction: column; gap: 4px; } .radio-row { display: flex; gap: 5px; margin-top: 10px;} .ropt { flex: 1; padding: 8px 3px; text-align: center; cursor: pointer; border: 1px solid var(--border); border-radius: 6px; font-family: "Rajdhani"; font-weight: 600; font-size: .78rem; color: var(--muted2); transition: .2s; user-select: none; text-transform: uppercase;} .ropt.sW { background: rgba(48, 224, 138, .12); border-color: rgba(48, 224, 138, .4); color: var(--green); } .ropt.sG { background: rgba(240, 192, 64, .12); border-color: rgba(240, 192, 64, .4); color: var(--gold); } .ropt.sL { background: rgba(255, 80, 112, .12); border-color: rgba(255, 80, 112, .4); color: var(--red); } .pull-btns { display: flex; gap: 8px; margin-top: 15px; }
-    .timeline-wrapper { background: var(--card3); border: 1px solid var(--border); border-radius: 12px; padding: 15px; overflow-x: auto; margin-bottom: 14px; } .timeline-track { display: flex; align-items: flex-end; padding: 30px 20px 35px 15px; min-width: max-content; } .timeline-line { height: 3px; background: var(--border2); position: relative; margin-bottom: 3.5px; z-index: 1; flex-shrink: 0; } .timeline-node { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 5; flex-shrink: 0; width: 44px; } .timeline-pity { font-family: 'Rajdhani', sans-serif; font-weight: 800; font-size: 0.95rem; margin-bottom: 4px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); } .timeline-img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 2px solid; background: var(--card2); box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 6px; position: relative; z-index: 10; } .timeline-point { width: 10px; height: 10px; border-radius: 50%; z-index: 5; } .timeline-name { position: absolute; top: 100%; margin-top: 6px; font-size: 0.6rem; color: var(--muted2); white-space: nowrap; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-    .tl-W { color: var(--accent); border-color: var(--accent); } .tl-bg-W { background: var(--accent); box-shadow: 0 0 8px var(--accent); } .tl-L { color: var(--red); border-color: var(--red); } .tl-bg-L { background: var(--red); box-shadow: 0 0 8px var(--red); } .tl-G { color: var(--gold); border-color: var(--gold); } .tl-bg-G { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
-    .hist-list { display: flex; flex-direction: column; gap: 7px; } .hist-item { display: flex; align-items: center; gap: 10px; padding: 9px 11px; background: var(--card2); border: 1px solid var(--border); border-radius: 9px; transition: border-color .2s; } .hist-n { font-family: "Rajdhani"; font-size: .7rem; color: var(--muted); width: 18px; text-align: center; } .hist-name { flex: 1; font-family: "Rajdhani"; font-weight: 700; font-size: .92rem; } .hist-pp { font-size: .62rem; padding: 2px 7px; border-radius: 4px; background: rgba(255, 255, 255, .06); font-weight: 600; } .hist-ft { font-size: .62rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; } .btn-del-hist { background: none; border: none; color: var(--muted); cursor: pointer; padding: 4px; transition: color .2s; } .hist-empty { font-size: .68rem; color: var(--muted); text-align: center; padding: 14px 0; }
-    .cdown { display: flex; gap: 5px; } .tblock { flex: 1; background: var(--card2); border: 1px solid var(--border); border-radius: 8px; padding: 9px 3px 7px; text-align: center; position: relative; overflow: hidden; } .tnum { font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: 1.6rem; line-height: 1; color: var(--accent2); display: block; } .tlabel { font-size: .48rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted2); margin-top: 3px; display: block; } .done-msg { display: none; text-align: center; padding: 4px 0; font-family: "Rajdhani", sans-serif; font-size: .75rem; font-weight: 700; color: var(--green); } .is-done .done-msg { display: block; }
-    .banner-container-box { background: rgba(0, 0, 0, 0.45); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; backdrop-filter: blur(8px); display: flex; flex-direction: column; gap:10px; margin-bottom: 15px;} .bchar { display: flex; align-items: center; gap: 14px; padding: 12px 14px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; border: 1px solid var(--border); } .bchar img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; background: var(--card); } .bchar-name { font-family: "Rajdhani"; font-weight: 700; font-size: 1.1rem; color: #fff; } .bbadge { display: inline-block; margin-top: 5px; font-size: .6rem; padding: 3px 8px; border-radius: 4px; background: rgba(240, 192, 64, .15); border: 1px solid rgba(240, 192, 64, .3); color: var(--gold); text-transform: uppercase;} .future-char { display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; } .future-char-icon { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; background: var(--card); } .future-char-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; } .future-char-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3px; } .future-char-name { font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: 0.95rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .future-char-version { font-size: 0.65rem; color: var(--muted2); font-weight: 600; letter-spacing: 0.05em; } .future-badge { font-size: 0.5rem; padding: 3px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; height: fit-content; line-height: 1; } .future-badge.new { background: rgba(48,224,138,0.15); color: var(--green); border: 1px solid rgba(48,224,138,0.3); } .future-badge.rerun { background: rgba(240,192,64,0.15); color: var(--gold); border: 1px solid rgba(240,192,64,0.3); } .future-trait-icon { width: 18px; height: 18px; object-fit: contain; background: rgba(0,0,0,0.3); border-radius: 4px; padding: 2px; border: 1px solid rgba(255,255,255,0.05); }
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; } .sc { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 9px; text-align: center; } .sc-num { font-family: "Rajdhani"; font-weight: 700; font-size: 1.55rem; line-height: 1; color: var(--accent2); display: block; } .sc-lbl { font-size: .54rem; text-transform: uppercase; color: var(--muted2); margin-top: 4px; display: block; }
-    .c-g { color: var(--green); } .c-y { color: var(--gold); } .c-r { color: var(--red); } .bpage { padding: 26px 30px 48px; max-width: 1300px; margin: 0 auto; } .bp-title { font-family: "Rajdhani"; font-weight: 700; font-size: 1.5rem; letter-spacing: .15em; text-transform: uppercase; color: var(--text); margin-bottom: 4px; } .bp-sub { font-size: .68rem; color: var(--muted2); letter-spacing: .09em; margin-bottom: 22px; }
-    @media (max-width: 800px) { .tracker-layout { flex-direction: column; } .cards-rail { width: 100%; height: auto; flex-direction: row; position: sticky; top: 52px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 10px; overflow-x: auto; overflow-y: hidden; } .game-card { min-width: 120px; flex-shrink: 0; } .game-card img { height: 70px; } #main-panel-bg, #main-panel-bg-overlay { left: 0 !important; } }
-    @media (max-width: 640px) { .nav-logo-text { display: none; } .main-panel { padding: 15px 12px 30px; } .pity-cells { grid-template-columns: 1fr 1fr; } .game-sub-nav { overflow-x: auto; white-space: nowrap; padding-bottom: 5px; } .game-sub-nav::-webkit-scrollbar { display: none; } .sub-tab-btn { flex-shrink: 0; font-size: 0.75rem; padding: 8px 12px; } .radio-row { flex-wrap: wrap; } .stats-grid { grid-template-columns: 1fr; } }
+    /* ── RESET ── */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    /* ── THEMES ── */
+    :root {
+      --bg: #080b10;
+      --card: #0f1520;
+      --card2: #131a28;
+      --card3: #0b1019;
+      --border: rgba(80, 160, 255, .13);
+      --border2: rgba(80, 160, 255, .28);
+      --accent: #2e9fff;
+      --accent2: #5bc4ff;
+      --aR: 46;
+      --aG: 159;
+      --aB: 255;
+      --gold: #f0c040;
+      --red: #ff5070;
+      --green: #30e08a;
+      --purple: #b47fff;
+      --text: #ccd6f0;
+      --muted: #4a5878;
+      --muted2: #7080a0;
+    }
+
+    [data-game="genshin"] {
+      --accent: #c9a227;
+      --accent2: #f0d060;
+      --aR: 201;
+      --aG: 162;
+      --aB: 39;
+      --card: #1a1c10;
+      --card2: #20221a;
+      --card3: #111208;
+      --border: rgba(200, 180, 80, .15);
+      --border2: rgba(240, 200, 60, .32);
+      --text: #e8e0c8;
+      --muted: #6a6040;
+      --muted2: #9a8a60;
+    }
+
+    [data-game="hsr"] {
+      --accent: #9b59f5;
+      --accent2: #c090ff;
+      --aR: 155;
+      --aG: 89;
+      --aB: 245;
+      --card: #130f1e;
+      --card2: #1a1428;
+      --card3: #0a0810;
+      --border: rgba(160, 100, 255, .15);
+      --border2: rgba(180, 120, 255, .30);
+      --text: #ddd0f8;
+      --muted: #504070;
+      --muted2: #8070a8;
+    }
+
+    [data-game="zzz"] {
+      --accent: #00f5f5;
+      --accent2: #5effff;
+      --aR: 0;
+      --aG: 245;
+      --aB: 245;
+      --card: #0a1111;
+      --card2: #101a1a;
+      --card3: #0a0a0b;
+      --border: rgba(0, 245, 245, 0.15);
+      --border2: rgba(0, 245, 245, 0.30);
+      --text: #e0f8f8;
+      --muted: #484840;
+      --muted2: #888870;
+    }
+
+    [data-game="endfield"] {
+      --accent: #30e08a;
+      --accent2: #60ffaa;
+      --aR: 48;
+      --aG: 224;
+      --aB: 138;
+      --card: #0f1a14;
+      --card2: #142018;
+      --card3: #0a120e;
+      --border: rgba(48, 224, 138, .14);
+      --border2: rgba(60, 240, 150, .30);
+      --text: #cce8d8;
+      --muted: #3a5848;
+      --muted2: #6a9878;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Exo 2", sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background .5s, color .5s;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(var(--aR), var(--aG), var(--aB), .03) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--aR), var(--aG), var(--aB), .03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 20% 20%, rgba(var(--aR), var(--aG), var(--aB), .12) 0%, transparent 60%), radial-gradient(ellipse 60% 60% at 80% 80%, rgba(var(--aR), var(--aG), var(--aB), .09) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      transition: background .5s;
+    }
+
+    /* ── TOPNAV ── */
+    .topnav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      z-index: 200;
+      background: rgba(8, 11, 16, .93);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      transition: border-color .4s;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 18px;
+      border-right: 1px solid var(--border);
+      height: 100%;
+      flex-shrink: 0;
+    }
+
+    .nav-logo-icon {
+      width: 26px;
+      height: 26px;
+      border: 1.5px solid var(--accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(var(--aR), var(--aG), var(--aB), .25);
+      transition: border-color .4s, box-shadow .4s;
+    }
+
+    .nav-logo-text {
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: stretch;
+      height: 100%;
+      flex: 1;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 15px;
+      cursor: pointer;
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 600;
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      border-bottom: 2px solid transparent;
+      transition: color .2s, border-color .2s, background .2s;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .nav-tab:hover {
+      color: var(--text);
+      background: rgba(var(--aR), var(--aG), var(--aB), .05);
+    }
+
+    .nav-tab.active {
+      color: var(--accent2);
+      border-bottom-color: var(--accent);
+    }
+
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 14px;
+    }
+
+    .cloud-icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted2);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, transform 0.2s;
+      padding: 0 5px;
+    }
+
+    .cloud-icon-btn:hover {
+      color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 11px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted2);
+      font-family: "Exo 2", sans-serif;
+      font-size: .65rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, color .2s, border-color .2s;
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover {
+      background: rgba(var(--aR), var(--aG), var(--aB), .1);
+      color: var(--accent2);
+      border-color: var(--border2);
+    }
+
+    /* ── PAGES ── */
+    .page {
+      display: none;
+      position: relative;
+      z-index: 2;
+      padding-top: 52px;
+      min-height: 100vh;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* ── TRACKER LAYOUT ── */
+    .tracker-layout {
+      display: flex;
+      min-height: calc(100vh - 52px);
+    }
+
+    .cards-rail {
+      width: 190px;
+      flex-shrink: 0;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      position: sticky;
+      top: 52px;
+      height: calc(100vh - 52px);
+      overflow-y: auto;
+      background: rgba(8, 11, 16, 0.4) !important;
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+
+    .game-card {
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      background: rgba(255, 255, 255, 0.03) !important;
+      opacity: 0.5;
+    }
+
+    .game-card:hover {
+      opacity: 0.9;
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .game-card.active {
+      opacity: 1;
+      background: rgba(var(--aR), var(--aG), var(--aB), 0.15) !important;
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 15px rgba(var(--aR), var(--aG), var(--aB), 0.2);
+    }
+
+    .game-card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      display: block;
+      filter: brightness(.72);
+      transition: filter .3s;
+    }
+
+    .game-card:hover img,
+    .game-card.active img {
+      filter: brightness(1);
+    }
+
+    .game-card-name {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 5px 8px 6px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, .82));
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 700;
+      font-size: .72rem;
+      letter-spacing: .07em;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .main-panel {
+      flex: 1;
+      min-width: 0;
+      padding: 22px 26px 48px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .main-panel>*:not(#main-panel-bg) {
+      position: relative;
+      z-index: 1;
+    }
+
+    .welcome-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      text-align: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .welcome-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--card2);
+    }
+
+    .welcome-title {
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: .1em;
+      color: var(--muted2);
+    }
+
+    .game-panel {
+      display: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .game-panel.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .gp-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .gp-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 9px;
+      border: 1.5px solid var(--accent);
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(var(--aR), var(--aG), var(--aB), .22);
+    }
+
+    .gp-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gp-title {
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 700;
+      font-size: 1.35rem;
+      letter-spacing: .07em;
+      color: var(--text);
+    }
+
+    .gp-sub {
+      font-size: .65rem;
+      color: var(--muted2);
+      margin-top: 2px;
+      letter-spacing: .06em;
+    }
+
+    /* ── SUB-NAV INTERNA DO JOGO ── */
+    .game-sub-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .sub-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted2);
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .sub-tab-btn:hover {
+      color: var(--text);
+      background: rgba(var(--aR), var(--aG), var(--aB), 0.08);
+    }
+
+    .sub-tab-btn.active {
+      color: var(--accent2);
+      background: rgba(var(--aR), var(--aG), var(--aB), 0.15);
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(var(--aR), var(--aG), var(--aB), 0.15);
+    }
+
+    .gtab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .gtab-content.active {
+      display: block;
+    }
+
+    /* ── COMPONENTES GERAIS ── */
+    .sec2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .pblock {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      transition: background .4s, border-color .4s;
+    }
+
+    .pblock-title {
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted2);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pblock-title svg {
+      opacity: .45;
+      flex-shrink: 0;
+    }
+
+    /* Status & Countdown */
+    .cdown {
+      display: flex;
+      gap: 5px;
+    }
+
+    .tblock {
+      flex: 1;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 3px 7px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tnum {
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+      line-height: 1;
+      color: var(--accent2);
+      display: block;
+    }
+
+    .tlabel {
+      font-size: .48rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted2);
+      margin-top: 3px;
+      display: block;
+    }
+
+    .done-msg {
+      display: none;
+      text-align: center;
+      padding: 4px 0;
+      font-family: "Rajdhani", sans-serif;
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    .is-done .done-msg {
+      display: block;
+    }
+
+    .btn-small {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      color: var(--muted2);
+      font-family: "Exo 2", sans-serif;
+      font-size: .65rem;
+      text-transform: uppercase;
+      padding: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 9px;
+      transition: .2s;
+    }
+
+    .btn-small:hover {
+      background: rgba(var(--aR), var(--aG), var(--aB), .07);
+      color: var(--accent2);
+      border-color: var(--accent);
+    }
+
+    .cfg-panel {
+      display: none;
+      margin-top: 8px;
+      padding: 11px;
+      background: rgba(0, 0, 0, .3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .cfg-panel.open {
+      display: block;
+    }
+
+    .date-inp {
+      width: 100%;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 7px 9px;
+      outline: none;
+    }
+
+    .btn-apply {
+      margin-top: 6px;
+      width: 100%;
+      background: linear-gradient(135deg, rgba(var(--aR), var(--aG), var(--aB), .6), rgba(var(--aR), var(--aG), var(--aB), 1));
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 700;
+      font-size: .75rem;
+      padding: 7px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    /* Pity Tracker */
+    .pity-cells {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+
+    .pc {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px 5px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .pc-lbl {
+      font-size: .5rem;
+      text-transform: uppercase;
+      color: var(--muted2);
+    }
+
+    .pc-val {
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+
+    .pc-val.sm {
+      font-size: .82rem;
+      line-height: 1.3;
+    }
+
+    .pbar-wrap {
+      margin-top: 2px;
+    }
+
+    .pbar-hdr {
+      display: flex;
+      justify-content: space-between;
+      font-size: .58rem;
+      color: var(--muted2);
+      margin-bottom: 4px;
+    }
+
+    .pbar-hdr span {
+      color: var(--accent2);
+      font-weight: 600;
+    }
+
+    .pbar-bg {
+      height: 4px;
+      background: rgba(255, 255, 255, .07);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .pbar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .7s ease, background .4s;
+    }
+
+    /* Pity Form (Collapsible) */
+    .pity-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 14px;
+    }
+
+    .pity-toggle-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .btn-toggle-pity {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      color: var(--muted2);
+      font-family: "Exo 2", sans-serif;
+      font-size: .7rem;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .btn-toggle-pity:hover {
+      background: rgba(var(--aR), var(--aG), var(--aB), .08);
+      color: var(--accent2);
+      border-color: var(--accent);
+    }
+
+    .pull-collapsible {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height .4s cubic-bezier(.4, 0, .2, 1), opacity .3s;
+      opacity: 0;
+    }
+
+    .pull-collapsible.open {
+      max-height: 700px;
+      opacity: 1;
+    }
+
+    .pull-wrap {
+      background: var(--card3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 14px;
+      margin-bottom: 15px;
+    }
+
+    .pe-grp {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pe-lbl {
+      font-size: .58rem;
+      text-transform: uppercase;
+      color: var(--muted2);
+    }
+
+    .pe-inp {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 8px 9px;
+      outline: none;
+      width: 100%;
+      font-family: "Exo 2";
+    }
+
+    .radio-row {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .ropt {
+      flex: 1;
+      padding: 8px 3px;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: "Rajdhani";
+      font-weight: 600;
+      font-size: .78rem;
+      color: var(--muted2);
+      transition: .2s;
+      user-select: none;
+      text-transform: uppercase;
+    }
+
+    .ropt.sW {
+      background: rgba(48, 224, 138, .12);
+      border-color: rgba(48, 224, 138, .4);
+      color: var(--green);
+    }
+
+    .ropt.sG {
+      background: rgba(240, 192, 64, .12);
+      border-color: rgba(240, 192, 64, .4);
+      color: var(--gold);
+    }
+
+    .ropt.sL {
+      background: rgba(255, 80, 112, .12);
+      border-color: rgba(255, 80, 112, .4);
+      color: var(--red);
+    }
+
+    .pull-btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .btn-post {
+      flex: 1;
+      background: linear-gradient(135deg, rgba(var(--aR), var(--aG), var(--aB), .55), rgba(var(--aR), var(--aG), var(--aB), 1));
+      border: none;
+      border-radius: 7px;
+      color: #fff;
+      font-family: "Rajdhani";
+      font-weight: 700;
+      font-size: .8rem;
+      padding: 10px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .btn-edit {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      color: var(--muted2);
+      font-family: "Rajdhani";
+      font-weight: 600;
+      padding: 10px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    /* TIMELINE DE PITY (CORRIGIDA) */
+    .timeline-wrapper {
+      background: var(--card3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px;
+      overflow-x: auto;
+      margin-bottom: 14px;
+    }
+
+    .timeline-track {
+      display: flex;
+      align-items: flex-end;
+      padding: 30px 20px 35px 15px;
+    }
+
+    .timeline-line {
+      height: 3px;
+      background: var(--border2);
+      position: relative;
+      margin-bottom: 3.5px;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+
+    .timeline-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 5;
+      flex-shrink: 0;
+      width: 44px;
+    }
+
+    .timeline-pity {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .timeline-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid;
+      background: var(--card2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .timeline-point {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      z-index: 5;
+    }
+
+    .timeline-name {
+      position: absolute;
+      top: 100%;
+      margin-top: 6px;
+      font-size: 0.6rem;
+      color: var(--muted2);
+      white-space: nowrap;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Colors 50/50 */
+    .tl-W {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .tl-bg-W {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .tl-L {
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    .tl-bg-L {
+      background: var(--red);
+      box-shadow: 0 0 8px var(--red);
+    }
+
+    .tl-G {
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .tl-bg-G {
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+    }
+
+    /* Classic History List */
+    .hist-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .hist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 11px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      transition: border-color .2s;
+    }
+
+    .hist-item:hover {
+      border-color: var(--border2);
+    }
+
+    .hist-n {
+      font-family: "Rajdhani";
+      font-size: .7rem;
+      color: var(--muted);
+      width: 18px;
+      text-align: center;
+    }
+
+    .hist-name {
+      flex: 1;
+      font-family: "Rajdhani";
+      font-weight: 700;
+      font-size: .92rem;
+    }
+
+    .hist-pp {
+      font-size: .62rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .06);
+      font-weight: 600;
+    }
+
+    .hist-ft {
+      font-size: .62rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .btn-del-hist {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px;
+      transition: color .2s;
+    }
+
+    .btn-del-hist:hover {
+      color: var(--red);
+    }
+
+    .hist-empty {
+      font-size: .68rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 14px 0;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .sc {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 9px;
+      text-align: center;
+    }
+
+    .sc-num {
+      font-family: "Rajdhani";
+      font-weight: 700;
+      font-size: 1.55rem;
+      line-height: 1;
+      color: var(--accent2);
+      display: block;
+    }
+
+    .sc-lbl {
+      font-size: .54rem;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── BANNERS STYLING (MODIFICADO) ── */
+    /* Container unificado para Live e Futuro */
+    .banner-container-box {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-top: 15px;
+      backdrop-filter: blur(8px);
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Live Banner */
+    .bcard-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .bcard-title {
+      font-family: "Rajdhani";
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .bcard-sub {
+      font-size: .62rem;
+      color: rgba(255, 255, 255, .6);
+      margin-top: 2px;
+    }
+
+    .bcard-link {
+      font-size: .62rem;
+      color: rgba(255, 255, 255, .7);
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 4px;
+      padding: 4px 10px;
+      transition: .2s;
+    }
+
+    .bcard-link:hover {
+      background: rgba(255, 255, 255, .15);
+      color: #fff;
+    }
+
+    .bchars {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bchar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+
+    .bchar:hover {
+      border-color: var(--border2);
+    }
+
+    .bchar img {
+      width: 64px;
+      height: 64px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: var(--card);
+    }
+
+    .bchar-name {
+      font-family: "Rajdhani";
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .bchar-stars {
+      color: #f5c800;
+      font-size: .75rem;
+      margin-top: 2px;
+    }
+
+    .bbadge {
+      display: inline-block;
+      margin-top: 5px;
+      font-size: .6rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(240, 192, 64, .15);
+      border: 1px solid rgba(240, 192, 64, .3);
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .bload {
+      text-align: center;
+      padding: 22px;
+      font-size: .7rem;
+      color: rgba(255, 255, 255, .5);
+    }
+
+    .bload svg {
+      animation: spin 1s linear infinite;
+      margin-bottom: 5px;
+      opacity: 0.5;
+    }
+
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Banners Futuros */
+    .future-char {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: border-color .3s, background .3s;
+    }
+
+    .future-char:hover {
+      border-color: var(--border2);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .future-char-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+      background: var(--card);
+    }
+
+    .future-char-info {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .future-char-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 3px;
+    }
+
+    .future-char-name {
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .future-char-traits {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 3px;
+    }
+
+    .future-trait-icon {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+      padding: 2px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .future-char-version {
+      font-size: 0.65rem;
+      color: var(--muted2);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .future-badge {
+      font-size: 0.5rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      height: fit-content;
+      line-height: 1;
+    }
+
+    .future-badge.new {
+      background: rgba(48, 224, 138, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(48, 224, 138, 0.3);
+    }
+
+    .future-badge.rerun {
+      background: rgba(240, 192, 64, 0.15);
+      color: var(--gold);
+      border: 1px solid rgba(240, 192, 64, 0.3);
+    }
+
+    /* Helpers */
+    .c-g {
+      color: var(--green);
+    }
+
+    .c-y {
+      color: var(--gold);
+    }
+
+    .c-r {
+      color: var(--red);
+    }
+
+    .bpage {
+      padding: 26px 30px 48px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .bp-title {
+      font-family: "Rajdhani";
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .bp-sub {
+      font-size: .68rem;
+      color: var(--muted2);
+      letter-spacing: .09em;
+      margin-bottom: 22px;
+    }
+
+    .btn-monthly-backup {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: rgba(var(--aR), var(--aG), var(--aB), 0.1);
+      border: 1px solid var(--accent);
+      color: var(--accent2);
+      border-radius: 8px;
+      font-family: "Rajdhani";
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn-monthly-backup:hover {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(var(--aR), var(--aG), var(--aB), 0.4);
+    }
+
+    .comp-grid {
+      display: grid;
+      grid-template-columns: 1fr 40px 1fr;
+      gap: 10px;
+    }
+
+    /* ── RESPONSIVIDADE (MOBILE FIX) ── */
+    @media (max-width: 800px) {
+      .tracker-layout {
+        flex-direction: column;
+      }
+
+      .cards-rail {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        position: sticky;
+        top: 52px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+
+      .game-card {
+        min-width: 120px;
+        flex-shrink: 0;
+      }
+
+      .game-card img {
+        height: 70px;
+      }
+
+      #main-panel-bg,
+      #main-panel-bg-overlay {
+        left: 0 !important;
+      }
+
+      .comp-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .comp-grid .vs-text {
+        margin: 10px 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav-logo-text {
+        display: none;
+      }
+
+      .nav-btn span {
+        display: none;
+      }
+
+      .nav-btn {
+        padding: 6px;
+      }
+
+      .main-panel {
+        padding: 15px 12px 30px;
+      }
+
+      .sec2 {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .pity-cells {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .game-sub-nav {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 5px;
+      }
+
+      .game-sub-nav::-webkit-scrollbar {
+        display: none;
+      }
+
+      .sub-tab-btn {
+        flex-shrink: 0;
+        font-size: 0.75rem;
+        padding: 8px 12px;
+      }
+
+      .pull-wrap>div:first-child {
+        grid-template-columns: 1fr !important;
+      }
+
+      .radio-row {
+        flex-wrap: wrap;
+      }
+
+      #cloud-form-container>div {
+        grid-template-columns: 1fr !important;
+      }
+
+      .gp-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .bcard-head {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .bcard-link {
+        align-self: flex-start;
+        margin-top: 5px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-tab {
+        font-size: 0.65rem;
+        padding: 0 10px;
+      }
+    }
   </style>
 </head>
 
-<body x-data :data-game="$store.app.activeGame">
+<body>
 
   <!-- NAV SUPERIOR -->
   <nav class="topnav">
     <div class="nav-logo">
-      <div class="nav-logo-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg></div>
-      <span class="nav-logo-text">Gacha Tracker PRO</span>
+      <div class="nav-logo-icon">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      </div>
+      <span class="nav-logo-text">Gacha Tracker</span>
     </div>
+
     <div class="nav-tabs">
-      <div class="nav-tab" :class="{ 'active': $store.app.activePage === 'tracker' }" @click="$store.app.activePage = 'tracker'">Tracker</div>
-      <div class="nav-tab" :class="{ 'active': $store.app.activePage === 'monthly' }" @click="$store.app.activePage = 'monthly'">Resumo Mensal</div>
-      <div class="nav-tab" :class="{ 'active': $store.app.activePage === 'save' }" @click="$store.app.activePage = 'save'">Salvar & Nuvem</div>
+      <div class="nav-tab active" id="ntab-tracker" onclick="switchPage('tracker')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+        Tracker
+      </div>
+      <div class="nav-tab" id="ntab-monthly" onclick="switchPage('monthly')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        Resumo Mensal
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <button class="cloud-icon-btn" onclick="switchPage('cloud')" title="Sincronização em Nuvem">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+        </svg>
+      </button>
+
+      <button class="nav-btn" onclick="exportData()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        <span>Exportar</span>
+      </button>
+      <button class="nav-btn" onclick="document.getElementById('importFile').click()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <span>Importar</span>
+      </button>
+      <input type="file" id="importFile" accept=".json" onchange="importData(this)" style="display: none;">
     </div>
   </nav>
 
-  <!-- PÁGINA 1: TRACKER PRINCIPAL -->
-  <div class="page" :class="{ 'active': $store.app.activePage === 'tracker' }">
+  <!-- PÁGINA: TRACKER PRINCIPAL -->
+  <div class="page active" id="page-tracker">
     <div class="tracker-layout">
+
       <!-- Menu Lateral -->
       <div class="cards-rail">
-        <template x-for="game in $store.app.games" :key="game.id">
-          <div class="game-card" :class="{ 'active': $store.app.activeGame === game.id }" @click="$store.app.selectGame(game.id)">
-            <img :src="game.img" :alt="game.name">
-            <div class="game-card-name" x-text="game.short"></div>
-          </div>
-        </template>
+        <div class="game-card" id="gc-genshin" onclick="selectGame('genshin')">
+          <img id="cimg-genshin" src="" alt="Genshin Impact">
+          <div class="game-card-name">Genshin</div>
+        </div>
+        <div class="game-card" id="gc-hsr" onclick="selectGame('hsr')">
+          <img id="cimg-hsr" src="" alt="HSR">
+          <div class="game-card-name">Star Rail</div>
+        </div>
+        <div class="game-card" id="gc-zzz" onclick="selectGame('zzz')">
+          <img id="cimg-zzz" src="" alt="Zenless">
+          <div class="game-card-name">Zenless</div>
+        </div>
+        <div class="game-card" id="gc-endfield" onclick="selectGame('endfield')">
+          <img id="cimg-endfield" src="" alt="Endfield">
+          <div class="game-card-name">Endfield</div>
+        </div>
       </div>
 
-      <!-- Área de Conteúdo -->
+      <!-- Área de Conteúdo do Tracker -->
       <div class="main-panel">
-        
-        <div id="main-panel-bg" style="position:fixed;top:52px;left:190px;right:0;bottom:0;z-index:0;background-size:cover;background-position:center top;transition:opacity .7s ease;pointer-events:none;" 
-             :style="'background-image: url(' + $store.app.currentGameObj?.img + '); opacity: ' + ($store.app.activeGame ? '1' : '0')"></div>
-        <div id="main-panel-bg-overlay" style="position:fixed;top:52px;left:190px;right:0;bottom:0;z-index:0;background:linear-gradient(135deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.75) 60%,rgba(0,0,0,.82) 100%);transition:opacity .7s ease;pointer-events:none;" 
-             :style="'opacity: ' + ($store.app.activeGame ? '1' : '0')"></div>
-        
-        <div class="welcome-screen" x-show="!$store.app.activeGame">
-          <div class="welcome-title">Selecione um jogo à esquerda</div>
+        <div id="main-panel-bg"
+          style="position:fixed;top:52px;left:190px;right:0;bottom:0;z-index:0;background-size:cover;background-position:center top;opacity:0;transition:opacity .7s ease;pointer-events:none;">
+        </div>
+        <div id="main-panel-bg-overlay"
+          style="position:fixed;top:52px;left:190px;right:0;bottom:0;z-index:0;background:linear-gradient(135deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.75) 60%,rgba(0,0,0,.82) 100%);opacity:0;transition:opacity .7s ease;pointer-events:none;">
         </div>
 
-        <div x-show="$store.app.activeGame" style="position:relative; z-index:1;">
+        <div class="welcome-screen" id="welcome-screen">
+          <div class="welcome-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--muted2)" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </div>
+          <div class="welcome-title">Selecione um jogo</div>
+          <div class="welcome-sub" style="color:var(--muted); font-size:0.75rem;">Clique em um card à esquerda (ou topo)
+            para gerenciar sua conta e histórico.</div>
+        </div>
+
+        <div id="panels-wrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PÁGINA: RESUMO MENSAL -->
+  <div class="page" id="page-monthly">
+    <div class="bpage">
+      <div class="bp-title">Resumo Mensal</div>
+      <div class="bp-sub" id="monthly-period-label">Carregando período...</div>
+      <div id="monthly-summary-content"></div>
+      <div style="text-align: center; margin-top: 30px;">
+        <button class="btn-monthly-backup" onclick="downloadMonthlyTxt()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Baixar Relatório Mensal (.TXT)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PÁGINA: NUVEM (CLOUD FORM) -->
+  <div class="page" id="page-cloud">
+    <div class="bpage">
+      <div class="bp-title">Sincronização Multi-Dispositivo</div>
+      <div class="bp-sub">Use uma chave única para conectar este dispositivo à sua conta na nuvem.</div>
+
+      <div class="pblock" style="max-width: 600px; margin: 0 auto;">
+        <div class="pblock-title">Chave de Sincronização</div>
+        <div class="pe-grp" style="margin-bottom: 20px;">
+          <label class="pe-lbl">Sua Chave Única (ID)</label>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="sync-id-input" class="pe-inp" placeholder="Crie ou insira seu ID de sincronização">
+            <button class="btn-edit" onclick="CloudSync.generateNewId()"
+              style="flex:unset; white-space: nowrap; padding: 8px 15px;">Gerar Nova</button>
+          </div>
+          <small style="color: var(--muted2); font-size:0.65rem; margin-top:4px;">Insira este mesmo ID em outro PC para
+            ver os mesmos dados.</small>
+        </div>
+
+        <div id="cloud-form-container">
+          <div class="pblock-title" style="margin-top: 20px;">Dados de Acesso (Hoyoverse)</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="pe-grp">
+              <label class="pe-lbl">ltuid_v2</label>
+              <input type="password" id="cloud-ltuid" class="pe-inp" placeholder="Oculto">
+            </div>
+            <div class="pe-grp">
+              <label class="pe-lbl">ltoken_v2</label>
+              <input type="password" id="cloud-ltoken" class="pe-inp" placeholder="Oculto">
+            </div>
+          </div>
+
+          <div class="pblock-title" style="margin-top: 20px;">Identificadores de Jogo (UID)</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+            <div class="pe-grp"><label class="pe-lbl">Genshin</label><input type="text" id="cloud-gs" class="pe-inp"
+                placeholder="Opcional"></div>
+            <div class="pe-grp"><label class="pe-lbl">Star Rail</label><input type="text" id="cloud-hsr" class="pe-inp"
+                placeholder="Opcional"></div>
+            <div class="pe-grp"><label class="pe-lbl">Zenless</label><input type="text" id="cloud-zzz" class="pe-inp"
+                placeholder="Opcional"></div>
+          </div>
+
+          <button id="btn-cloud-main" class="btn-post" onclick="performCloudSync()"
+            style="margin-top: 25px; width: 100%;">✓ Sincronizar e Proteger Dados</button>
+          <button id="btn-cloud-edit" class="btn-edit" onclick="unlockCloudFields()"
+            style="margin-top: 10px; width: 100%; display: none;">✎ Editar Dados</button>
+        </div>
+        <div id="cloud-status-msg" style="margin-top: 15px; font-size: 0.75rem; font-weight:bold; text-align: center;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Configurações Globais
+    window.ZZZ_ICONS = {};
+    window.charDb = {};
+
+    // ── IMAGES ──
+    const IMG = {
+      genshin: "https://i.ibb.co/60Ls3TmQ/5d2ba4371115d26de4c574b28311aed8-576844151847376526.jpg",
+      hsr: "https://i.ibb.co/0VFgQHtT/3c862d085db721a5625b6e12649399bc-8067514115196038699.png",
+      zzz: "https://i.ibb.co/WZs6LX2/3ba9a74bbed3272ff0a14e861e1e8418-8953409163702722405.png",
+      endfield: "https://i.ibb.co/G4qpXB2x/arknightsendfield-1ecp7.png",
+    };
+
+    // ── CONFIG ──
+    const GAMES = [
+      { id: "genshin", name: "Genshin Impact", short: "Genshin", max: 90, soft: 74, url: "https://paimon.moe/" },
+      { id: "hsr", name: "Honkai: Star Rail", short: "Star Rail", max: 90, soft: 74, url: "https://starrailstation.com/en/warp#global" },
+      { id: "zzz", name: "Zenless Zone Zero", short: "Zenless", max: 90, soft: 74, url: "https://zzz.rng.moe/en" },
+      { id: "endfield", name: "Arknights: Endfield", short: "Endfield", max: 80, soft: 60, url: "https://trackmypulls.com/en/endfield/tracker" },
+    ];
+    const GAME_THEME_COLORS = {
+      "Genshin Impact": "#c9a227", "Honkai: Star Rail": "#9b59f5",
+      "Zenless Zone Zero": "#00f5f5", "Arknights: Endfield": "#30e08a"
+    };
+
+    const RENEW = 21;
+    const MAX_HIST = 15;
+    const RENDER_URL = 'https://gacha-tracker-priv.onrender.com';
+    let liveRefreshTimer = null;
+
+    // ── STORAGE & STATE ──
+    const S = {
+      get(k, d = null) { try { const v = localStorage.getItem("gt_" + k); return v !== null ? JSON.parse(v) : d } catch { return d } },
+      set(k, v) { try { localStorage.setItem("gt_" + k, JSON.stringify(v)) } catch { } }
+    };
+    const timers = {};
+    const fiftyState = {};
+    let activeGame = null;
+    let bannerLoaded = false;
+
+    const esc = s => String(s).replace(/[&<>"\']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const pad = n => String(n).padStart(2, "0");
+    const ppCls = p => p < 50 ? "c-g" : p <= 70 ? "c-y" : "c-r";
+    const curCls = p => p < 50 ? "c-g" : p <= 70 ? "c-y" : "c-r";
+    const ftCls = v => v === "W" ? "c-g" : v === "G" ? "c-y" : "c-r";
+    const ftLbl = v => v === "W" ? "W · Ganhou" : v === "G" ? "G · Garantido" : "L · Perdeu";
+    const ftShort = v => v === "W" ? "W" : v === "G" ? "G" : "L";
+
+    // ==========================================
+    // 1. FETCH GOOGLE SHEETS (CSV) PARA TIMELINE E FUTUROS
+    // ==========================================
+    async function fetchCharCSV() {
+      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm5Kk3LdPMBgYh17C6PQrRX_xI1G6KG8xv2Ubh9GhfKjBzig0oaJUZZ7P5BDy0-Eh1Lm4icCiYQeYr/pub?output=csv";
+      const proxies = [u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u)];
+
+      for (let getUrl of proxies) {
+        try {
+          const res = await fetch(getUrl(csvUrl));
+          if (!res.ok) continue;
+          const text = await res.text();
+          const lines = text.split('\n');
+
+          for (let i = 1; i < lines.length; i++) {
+            const row = lines[i];
+            if (!row) continue;
+            let parts = [], cur = "", inQ = false;
+            for (let c of row) {
+              if (c === '"') inQ = !inQ;
+              else if (c === ',' && !inQ) { parts.push(cur); cur = ""; }
+              else cur += c;
+            }
+            parts.push(cur);
+            if (parts.length >= 3) {
+              const name = parts[1].replace(/^"|"$/g, "").trim().toLowerCase();
+              const img = parts[2].replace(/^"|"$/g, "").trim();
+              if (name) window.charDb[name] = img;
+            }
+          }
+          GAMES.forEach(g => renderTimeline(g.id));
+          break;
+        } catch (e) { }
+      }
+    }
+
+    // ==========================================
+    // 2. CONSTRUÇÃO DA INTERFACE DO TRACKER
+    // ==========================================
+    function buildPanels() {
+      const wrap = document.getElementById("panels-wrap");
+      wrap.innerHTML = "";
+
+      GAMES.forEach(g => {
+        const div = document.createElement("div");
+        div.className = "game-panel";
+        div.id = "gp-" + g.id;
+
+        let liveStatusHtml = "";
+        let codesHtml = "";
+
+        if (g.id !== "endfield") {
+          liveStatusHtml = `
+            <div id="live-status-container-${g.id}" class="pblock live-status-card" style="margin-bottom: 14px; border: 1px solid var(--accent); background: rgba(var(--aR), var(--aG), var(--aB), 0.05); position: relative;">
+                <div class="pblock-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <span>📡 Status em Tempo Real</span>
+                    <span id="live-update-time-${g.id}" style="font-size: 0.5rem; opacity: 0.6;">Aguardando...</span>
+                </div>
+                <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                    <div class="sc" style="padding: 10px 5px;">
+                        <span class="sc-num" id="live-resina-${g.id}" style="font-size: 1rem; color: var(--text);">--</span>
+                        <span class="sc-lbl" style="font-size: 0.55rem;">Resina/Energia</span>
+                    </div>
+                    <div class="sc" style="padding: 10px 5px;">
+                        <span class="sc-num" id="live-diaria-${g.id}" style="font-size: 0.8rem;">--</span>
+                        <span class="sc-lbl" style="font-size: 0.55rem;">Diárias</span>
+                    </div>
+                </div>
+                <button id="btn-sync-live-${g.id}" class="btn-small" onclick="triggerManualSync()" style="margin-top: 10px; width: 100%; border-color: var(--accent); color: var(--accent2);">
+                    Sincronizar Agora
+                </button>
+            </div>`;
+
+          codesHtml = `
+            <div class="pblock" id="codes-block-${g.id}">
+                <div class="pblock-title">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
+                    Códigos Ativos
+                </div>
+                <div id="codes-list-${g.id}" class="bload" style="padding: 10px 0; text-align: left;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite; opacity: 0.5;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                    Carregando...
+                </div>
+            </div>
+          `;
+        }
+
+        const bannerSub = g.id === "genshin" ? "Banner de Personagem Ativo" : g.id === "hsr" ? "Event Warp Ativo" : g.id === "zzz" ? "Signal Search Ativo" : "Obtenção Especial";
+
+        div.innerHTML = `
           <div class="gp-header">
-            <div class="gp-icon"><img :src="$store.app.currentGameObj?.img" alt="Logo"></div>
+            <div class="gp-icon"><img src="${IMG[g.id]}" alt="${g.name}"></div>
             <div>
-              <div class="gp-title" x-text="$store.app.currentGameObj?.name"></div>
+              <div class="gp-title">${g.name}</div>
               <div class="gp-sub">Gerenciamento de conta e estatísticas</div>
             </div>
           </div>
 
+          <!-- NAV INTERNA DO JOGO -->
           <div class="game-sub-nav">
-              <button class="sub-tab-btn" :class="{'active': $store.app.activeTab === 'status'}" @click="$store.app.activeTab = 'status'">STATUS E UPDATE</button>
-              <button class="sub-tab-btn" :class="{'active': $store.app.activeTab === 'pity'}" @click="$store.app.activeTab = 'pity'">PITY E TIMELINE</button>
-              <button class="sub-tab-btn" :class="{'active': $store.app.activeTab === 'banner'}" @click="$store.app.activeTab = 'banner'">BANNERS</button>
-              <button class="sub-tab-btn" :class="{'active': $store.app.activeTab === 'stats'}" @click="$store.app.activeTab = 'stats'">ESTATÍSTICAS</button>
+              <button class="sub-tab-btn active" onclick="switchGameTab('${g.id}', 'status', this)">STATUS</button>
+              <button class="sub-tab-btn" onclick="switchGameTab('${g.id}', 'banner', this)">BANNER LIVE</button>
+              <button class="sub-tab-btn" onclick="switchGameTab('${g.id}', 'pity', this)">PITY HISTÓRICO</button>
+              <button class="sub-tab-btn" onclick="switchGameTab('${g.id}', 'stats', this)">ESTATÍSTICAS</button>
           </div>
 
-          <!-- ABA 1: STATUS E UPDATE -->
-          <div x-show="$store.app.activeTab === 'status'">
-            <div class="pblock">
-              <div class="pblock-title">Próximo Update</div>
-              <div class="cdown" :class="{'is-done': $store.countdown.isDone}">
-                <div class="tblock"><span class="tnum" x-text="$store.countdown.d">--</span><span class="tlabel">Dias</span></div>
-                <div class="tblock"><span class="tnum" x-text="$store.countdown.h">--</span><span class="tlabel">Hr</span></div>
-                <div class="tblock"><span class="tnum" x-text="$store.countdown.m">--</span><span class="tlabel">Min</span></div>
-                <div class="tblock"><span class="tnum" x-text="$store.countdown.s">--</span><span class="tlabel">Seg</span></div>
-              </div>
-              <div class="done-msg" x-show="$store.countdown.isDone">✦ Update disponível!</div>
-              <div x-data="{ openCfg: false }">
-                <button class="btn-small" @click="openCfg = !openCfg">Definir data do update</button>
-                <div class="pull-collapsible" :class="{ 'open': openCfg }">
-                  <div style="margin-top:10px;">
-                    <input type="datetime-local" class="pe-inp" x-model="$store.countdown.formDate">
-                    <button class="btn-post" style="margin-top:5px" @click="$store.countdown.saveDate(); openCfg = false">✓ Salvar Data</button>
+          <!-- 1. TAB: STATUS -->
+          <div id="gtab-${g.id}-status" class="gtab-content active">
+              ${liveStatusHtml}
+              <div class="pblock" id="cdb-${g.id}">
+                  <div class="pblock-title">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      Fim do Banner / Update
                   </div>
-                </div>
+                  <div class="cdown">
+                      <div class="tblock"><span class="tnum" id="${g.id}-d">--</span><span class="tlabel">Dias</span></div>
+                      <div class="tblock"><span class="tnum" id="${g.id}-h">--</span><span class="tlabel">Hr</span></div>
+                      <div class="tblock"><span class="tnum" id="${g.id}-m">--</span><span class="tlabel">Min</span></div>
+                      <div class="tblock"><span class="tnum" id="${g.id}-s">--</span><span class="tlabel">Seg</span></div>
+                  </div>
+                  <div class="done-msg" id="done-${g.id}">✦ Update disponível! Renovando...</div>
+                  <div class="status-mini" id="stxt-${g.id}">Aguardando dados...</div>
+                  <button class="btn-small" onclick="toggleCfg('${g.id}')">Modificar manualmente</button>
+                  <div class="cfg-panel" id="cfg-${g.id}">
+                      <div class="pblock-title" style="margin-bottom:5px;">Data do Update</div>
+                      <input type="datetime-local" class="date-inp" id="dt-${g.id}">
+                      <button class="btn-apply" onclick="applyDate('${g.id}')">✓ Salvar Data</button>
+                  </div>
               </div>
-            </div>
-
-            <!-- LIVE STATUS -->
-            <div class="pblock" style="border: 1px solid var(--accent); background: rgba(var(--aR), var(--aG), var(--aB), 0.05);">
-                <div class="pblock-title" style="display: flex; justify-content: space-between;">
-                    <span>📡 Status em Tempo Real (Via Nuvem)</span>
-                    <span style="opacity: 0.6;" x-text="$store.cloud.lastUpdateText"></span>
-                </div>
-                <div class="stats-grid">
-                    <div class="sc"><span class="sc-num" x-text="($store.cloud.currentLiveStats?.resin || $store.cloud.currentLiveStats?.stamina || $store.cloud.currentLiveStats?.energy) || '--'"></span><span class="sc-lbl">Resina/Energia</span></div>
-                    <div class="sc"><span class="sc-num" x-text="$store.cloud.currentLiveStats?.daily || '--'" :class="{'c-g': $store.cloud.currentLiveStats?.daily?.includes('4/4') || $store.cloud.currentLiveStats?.daily?.includes('500/500') || $store.cloud.currentLiveStats?.daily?.includes('400/400')}"></span><span class="sc-lbl">Missões Diárias</span></div>
-                </div>
-                <button class="btn-small" @click="$store.cloud.forceLiveUpdate()" :disabled="$store.cloud.isFetching" style="border-color: var(--accent); color: var(--accent2);">
-                    <span x-text="$store.cloud.syncBtnText"></span>
-                </button>
-            </div>
+              ${codesHtml}
           </div>
 
-          <!-- ABA 2: PITY E TIMELINE -->
-          <div x-show="$store.app.activeTab === 'pity'">
+          <!-- 2. TAB: BANNER LIVE E FUTUROS -->
+          <div id="gtab-${g.id}-banner" class="gtab-content">
+              <button class="btn-small" style="padding: 10px; font-weight:bold; margin-top:0;" id="btn-refresh-${g.id}" onclick="loadBanners(true)">
+                  Atualizar Dados de Banner Live Agora
+              </button>
+              
+              <!-- Container de Banner Atual -->
+              <div class="banner-container-box" id="bcard-${g.id}">
+                  <div class="bcard-head">
+                      <div><div class="bcard-title">${g.name}</div><div class="bcard-sub">${bannerSub}</div></div>
+                      <a class="bcard-link" href="${g.url}" target="_blank">Ver detalhes ↗</a>
+                  </div>
+                  <div class="bchars" id="bch-${g.id}">
+                      <div class="bload">Clique em Atualizar para carregar.</div>
+                  </div>
+              </div>
+
+              <!-- Container de Banners Futuros -->
+              <div class="pblock-title" style="margin-top: 20px;">Banners Futuros</div>
+              <div class="banner-container-box" id="future-banners-${g.id}">
+                  <div class="bload">Aguardando dados...</div>
+              </div>
+          </div>
+
+          <!-- 3. TAB: PITY HISTÓRICO & TIMELINE -->
+          <div id="gtab-${g.id}-pity" class="gtab-content">
+              
               <div class="pblock">
                   <div class="pblock-title">Pity Atual</div>
                   <div class="pity-cells">
-                      <div class="pc"><span class="pc-lbl">Personagem</span><span class="pc-val sm" style="color:var(--purple)" x-text="$store.tracker.currentPity?.char || '—'"></span></div>
-                      <div class="pc"><span class="pc-lbl">Pity no pull</span><span class="pc-val" :class="$store.tracker.getColorClass($store.tracker.currentPity?.pullPity)" x-text="$store.tracker.currentPity?.pullPity || '—'"></span></div>
-                      <div class="pc"><span class="pc-lbl">50/50</span><span class="pc-val sm" :style="'color:' + $store.tracker.getFiftyColor($store.tracker.currentPity?.fifty)" x-text="$store.tracker.getFiftyLabel($store.tracker.currentPity?.fifty)"></span></div>
-                      <div class="pc"><span class="pc-lbl">Pity atual</span><span class="pc-val" :class="$store.tracker.getColorClass($store.tracker.currentPity?.curPity)" x-text="$store.tracker.currentPity?.curPity || '0'"></span></div>
+                      <div class="pc"><span class="pc-lbl">Personagem</span><span class="pc-val sm" style="color:var(--purple)" id="pc-char-${g.id}">—</span></div>
+                      <div class="pc"><span class="pc-lbl">Pity no pull</span><span class="pc-val" id="pc-pp-${g.id}">—</span></div>
+                      <div class="pc"><span class="pc-lbl">50/50</span><span class="pc-val sm" style="color:var(--muted2)" id="pc-ft-${g.id}">—</span></div>
+                      <div class="pc"><span class="pc-lbl">Pity atual</span><span class="pc-val" id="pc-cur-${g.id}">—</span></div>
                   </div>
                   <div class="pbar-wrap">
-                      <div class="pbar-hdr"><span>0</span><span><span x-text="$store.tracker.currentPity?.curPity || 0"></span> / <span x-text="$store.app.currentGameObj?.max"></span></span><span x-text="$store.app.currentGameObj?.max"></span></div>
-                      <div class="pbar-bg"><div class="pbar-fill" :style="'width: ' + $store.tracker.progressPercent + '%; background: ' + $store.tracker.progressColor"></div></div>
+                      <div class="pbar-hdr"><span>0</span><span id="pblbl-${g.id}">— / ${g.max}</span><span>${g.max}</span></div>
+                      <div class="pbar-bg"><div class="pbar-fill" id="pb-${g.id}" style="width:0%"></div></div>
                   </div>
               </div>
 
-              <div x-data="{ openForm: false }">
-                <div class="pity-toggle-row"><div class="pity-toggle-line"></div><button class="btn-toggle-pity" @click="openForm = !openForm">Registrar Pull 5★</button><div class="pity-toggle-line"></div></div>
-                <div class="pull-collapsible" :class="{ 'open': openForm }">
-                    <div class="pull-wrap">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 9px;">
-                            <div class="pe-grp" style="grid-column:1/-1"><label class="pe-lbl">Personagem</label><input class="pe-inp" type="text" x-model="$store.tracker.form.char"></div>
-                            <div class="pe-grp"><label class="pe-lbl">Pity do 5★</label><input class="pe-inp" type="number" x-model.number="$store.tracker.form.pullPity"></div>
-                            <div class="pe-grp"><label class="pe-lbl">Pity atual</label><input class="pe-inp" type="number" x-model.number="$store.tracker.form.curPity"></div>
-                            <div class="pe-grp" style="grid-column:1/-1">
-                                <label class="pe-lbl">50/50</label>
-                                <div class="radio-row">
-                                    <div class="ropt" :class="{ 'sW': $store.tracker.form.fifty === 'W' }" @click="$store.tracker.form.fifty = 'W'">Ganhou</div>
-                                    <div class="ropt" :class="{ 'sG': $store.tracker.form.fifty === 'G' }" @click="$store.tracker.form.fifty = 'G'">Garantido</div>
-                                    <div class="ropt" :class="{ 'sL': $store.tracker.form.fifty === 'L' }" @click="$store.tracker.form.fifty = 'L'">Perdeu</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pull-btns">
-                            <button class="btn-post" @click="$store.tracker.savePull(true); openForm = false">✓ Postar Histórico</button>
-                            <button class="btn-edit" @click="$store.tracker.savePull(false); openForm = false">✎ Só Editar Card</button>
-                        </div>
-                    </div>
-                </div>
+              <div class="pity-toggle-row">
+                  <div class="pity-toggle-line"></div>
+                  <button class="btn-toggle-pity" id="ptbtn-${g.id}" onclick="togglePull('${g.id}')">
+                      Registrar Pull 5★ <svg style="transition:0.3s" class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="pity-toggle-line"></div>
               </div>
 
-              <div class="pblock-title" style="margin-top:10px;">Linha do Tempo (Distância = Pity)</div>
-              <div class="timeline-wrapper">
-                <div x-show="$store.tracker.reversedHistory.length === 0" style="color:var(--muted); font-size:0.8rem; text-align:center;">Nenhum pull registrado para criar o gráfico.</div>
-                <div class="timeline-track" x-show="$store.tracker.reversedHistory.length > 0">
-                    <template x-for="(h, i) in $store.tracker.reversedHistory" :key="i">
-                        <div style="display:flex; align-items:flex-end;">
-                            <div class="timeline-line" :style="'width:' + (h.pullPity * 3) + 'px;'"></div>
-                            <div class="timeline-node">
-                                <span class="timeline-pity" :class="$store.tracker.getTimelineColor(h.fifty)" x-text="h.pullPity"></span>
-                                <img :src="$store.app.getCharIcon(h.char)" class="timeline-img" :class="$store.tracker.getTimelineColor(h.fifty)" :title="h.char" onerror="this.src='https://placehold.co/44x44/131a28/7080a0?text=?'">
-                                <div class="timeline-point" :class="$store.tracker.getTimelineBgColor(h.fifty)"></div>
-                                <span class="timeline-name" x-text="h.char"></span>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-              </div>
-
-              <div class="pblock-title" style="margin-top:15px;">Histórico Recente</div>
-              <div class="hist-list">
-                  <template x-for="(h, index) in $store.tracker.currentHistory" :key="index">
-                    <div class="hist-item">
-                      <span class="hist-n">#<span x-text="$store.tracker.currentHistory.length - index"></span></span>
-                      <span class="hist-name" x-text="h.char"></span>
-                      <span class="hist-pp" :class="$store.tracker.getColorClass(h.pullPity)">Pity <span x-text="h.pullPity"></span></span>
-                      <span class="hist-ft" :style="'color:' + $store.tracker.getFiftyColor(h.fifty)" x-text="h.fifty"></span>
-                      <button class="btn-del-hist" @click="$store.tracker.deleteHistory(index)">X</button>
-                    </div>
-                  </template>
-                  <div class="hist-empty" x-show="$store.tracker.currentHistory.length === 0">Nenhum pull registrado.</div>
-              </div>
-          </div>
-
-          <!-- ABA 3: BANNERS E FUTUROS -->
-          <div x-show="$store.app.activeTab === 'banner'">
-            <button class="btn-small" style="padding: 10px; font-weight:bold; margin-top:0; margin-bottom: 10px;" @click="$store.banners.fetchData(true)">Forçar Atualização de Banners</button>
-            <div class="banner-container-box">
-                <div class="pblock-title" style="margin-bottom:0;">Banner Atual (Ativo)</div>
-                <div x-show="$store.banners.isLoading" style="color:var(--muted2)">Carregando...</div>
-                <template x-for="char in $store.banners.currentLive" :key="char.name">
-                  <div class="bchar">
-                    <img :src="char.icon" :alt="char.name" onerror="this.src='https://placehold.co/64x64/131a28/7080a0?text=?'">
-                    <div><div class="bchar-name" x-text="char.name"></div><div style="color: #f5c800; font-size: .75rem;">★★★★★</div><span class="bbadge">5★ · Banner Atual</span></div>
-                  </div>
-                </template>
-                <div x-show="!$store.banners.isLoading && $store.banners.currentLive.length === 0" style="color:var(--muted)">Nenhum banner ativo no momento.</div>
-            </div>
-            <div class="pblock-title" style="margin-top: 20px;">Banners Futuros</div>
-            <div class="banner-container-box">
-               <div x-show="$store.banners.isLoading" style="color:var(--muted2)">Aguardando dados...</div>
-               <template x-for="char in $store.banners.currentFuture" :key="char.name">
-                  <div class="future-char">
-                      <img :src="char.icon || $store.app.getCharIcon(char.name)" class="future-char-icon" onerror="this.src='https://placehold.co/50x50/131a28/7080a0?text=?'">
-                      <div class="future-char-info">
-                          <div class="future-char-header"><span class="future-char-name" x-text="char.name"></span><span class="future-badge" :class="char.rerun ? 'rerun' : 'new'" x-text="char.rerun ? 'Rerun' : 'Novo'"></span></div>
-                          <div class="future-char-traits"><template x-for="trait in char.traits"><img :src="trait" class="future-trait-icon" onerror="this.style.display='none'"></template></div>
-                          <div class="future-char-version">Versão <span x-text="char.ver"></span></div>
+              <div class="pull-collapsible" id="pull-col-${g.id}">
+                  <div class="pull-wrap">
+                      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 9px;">
+                          <div class="pe-grp" style="grid-column:1/-1">
+                              <label class="pe-lbl">Personagem</label>
+                              <input class="pe-inp" id="pei-char-${g.id}" type="text" placeholder="Nome exato do 5★ (Ex: Hu Tao)">
+                          </div>
+                          <div class="pe-grp">
+                              <label class="pe-lbl">Pity em que foi pego</label>
+                              <input class="pe-inp" id="pei-pp-${g.id}" type="number" placeholder="Ex: 78">
+                          </div>
+                          <div class="pe-grp">
+                              <label class="pe-lbl">Pity atual agora</label>
+                              <input class="pe-inp" id="pei-cur-${g.id}" type="number" placeholder="Ex: 0">
+                          </div>
+                          <div class="pe-grp" style="grid-column:1/-1">
+                              <label class="pe-lbl">50/50 do Pull</label>
+                              <div class="radio-row" id="rr-${g.id}">
+                                  <div class="ropt" data-val="W" onclick="selFifty('${g.id}','W')">W — Ganhou</div>
+                                  <div class="ropt" data-val="G" onclick="selFifty('${g.id}','G')">G — Garantido</div>
+                                  <div class="ropt" data-val="L" onclick="selFifty('${g.id}','L')">L — Perdeu</div>
+                              </div>
+                          </div>
                       </div>
+                      <div class="pull-btns">
+                          <button class="btn-post" onclick="postPull('${g.id}')">✓ Postar no histórico</button>
+                          <button class="btn-edit" onclick="editOnly('${g.id}')">✎ Só editar card</button>
+                      </div>
+                      <div id="peh-${g.id}" style="text-align:center; font-size:0.6rem; margin-top:5px; height:12px;"></div>
                   </div>
-               </template>
-               <div x-show="!$store.banners.isLoading && $store.banners.currentFuture.length === 0" style="color:var(--muted)">Nenhum banner futuro registrado.</div>
-            </div>
-          </div>
-
-          <!-- ABA 4: ESTATÍSTICAS -->
-          <div x-show="$store.app.activeTab === 'stats'">
-            <div class="pblock">
-              <div class="pblock-title" x-text="$store.app.currentGameObj?.name + ' STATS'"></div>
-              <div class="stats-grid">
-                <div class="sc"><span class="sc-num" x-text="$store.tracker.currentHistory.length"></span><span class="sc-lbl">Pulls Totais</span></div>
-                <div class="sc"><span class="sc-num c-y" x-text="$store.tracker.averagePity"></span><span class="sc-lbl">Pity Médio</span></div>
-                <div class="sc"><span class="sc-num c-g" x-text="$store.tracker.winRate + '%'"></span><span class="sc-lbl">Taxa 50/50</span></div>
-                <div class="sc"><span class="sc-num c-r" x-text="$store.tracker.worstPity"></span><span class="sc-lbl">Pior Pity</span></div>
               </div>
-            </div>
+
+              <!-- TIMELINE GRÁFICA -->
+              <div class="pblock-title" style="margin-top:10px;">Linha do Tempo (Distância = Pity)</div>
+              <div class="timeline-wrapper" id="timeline-${g.id}"></div>
+
+              <!-- LISTA HISTÓRICO CLASSICA -->
+              <div class="pblock-title" style="margin-top:15px;">Histórico (Últimos ${MAX_HIST})</div>
+              <div class="hist-list" id="hist-${g.id}"></div>
+
           </div>
 
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PÁGINA 2: RESUMO MENSAL -->
-  <div class="page" :class="{ 'active': $store.app.activePage === 'monthly' }">
-    <div class="bpage">
-      <div class="bp-title">Resumo Mensal</div>
-      <div class="bp-sub" x-text="'Dados de todos os jogos em ' + $store.monthly.currentMonthLabel"></div>
-      <div x-show="$store.monthly.total5 === 0" class="hist-empty">Nenhum 5★ registrado neste mês.</div>
-      <div x-show="$store.monthly.total5 > 0" class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
-          <div class="sc"><span class="sc-num" style="color:var(--accent2)" x-text="$store.monthly.total5"></span><span class="sc-lbl">Total 5★ (Mês)</span></div>
-          <div class="sc"><span class="sc-num" x-text="$store.monthly.avgPity"></span><span class="sc-lbl">Pity Médio</span></div>
-          <div class="sc"><span class="sc-num c-r" x-text="$store.monthly.maxPity"></span><span class="sc-lbl">Maior Pity</span></div>
-          <div class="sc"><span class="sc-num c-g" style="font-size: 1.1rem;" x-text="$store.monthly.bestGameName"></span><span class="sc-lbl">Sortudo (<span x-text="$store.monthly.bestGameWins"></span>W)</span></div>
-          <div class="sc" style="grid-column: span 2;"><span class="sc-num c-r" style="font-size: 1.1rem;" x-text="$store.monthly.worstGameName"></span><span class="sc-lbl">Azarado (<span x-text="$store.monthly.worstGameLosses"></span>L)</span></div>
-          <div class="sc" style="grid-column: 1 / -1"><span class="sc-num c-g" x-text="$store.monthly.winRate + '%'"></span><span class="sc-lbl">Taxa de Vitória no 50/50</span><span class="sc-sub" style="font-size:0.6rem; color:var(--muted);"><span x-text="$store.monthly.wins"></span>W | <span x-text="$store.monthly.losses"></span>L | <span x-text="$store.monthly.guaranteed"></span>G</span></div>
-      </div>
-      <div style="text-align: center; margin-top: 30px;"><button class="btn-post" style="max-width:300px; margin:0 auto;" @click="$store.monthly.downloadTxt()">Baixar Relatório Mensal (.TXT)</button></div>
-    </div>
-  </div>
-
-  <!-- PÁGINA 3: SALVAR E NUVEM -->
-  <div class="page" :class="{ 'active': $store.app.activePage === 'save' }">
-    <div class="bpage">
-      <div class="bp-title">Salvar Dados & Nuvem</div>
-      <div class="bp-sub">Faça backup local ou conecte seu arquivo ao servidor Render.com.</div>
-
-      <!-- LOCAL BACKUP -->
-      <div class="pblock" style="max-width: 600px; margin: 0 auto 20px;">
-        <div class="pblock-title">Backup Local (Offline)</div>
-        <p style="font-size:0.8rem; color:var(--muted2); margin-bottom:15px;">Baixe seus dados para o PC em formato .JSON ou restaure um arquivo antigo.</p>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-post" style="background:var(--card2); border:1px solid var(--border);" @click="$store.cloud.exportData()">Exportar .JSON</button>
-            <input type="file" id="importFile" accept=".json" style="display:none;" @change="$store.cloud.importData($event)">
-            <button class="btn-edit" @click="document.getElementById('importFile').click()">Importar .JSON</button>
-        </div>
-      </div>
-
-      <!-- CLOUD SYNC -->
-      <div class="pblock" style="max-width: 600px; margin: 0 auto;">
-        <div class="pblock-title">Sincronização Nuvem (Render)</div>
-        <div class="pe-grp" style="margin-bottom: 20px;">
-          <input type="text" class="pe-inp" placeholder="Seu Sync ID" x-model="$store.cloud.syncId" :disabled="$store.cloud.locked">
-        </div>
-        
-        <div class="pblock-title">Dados de Acesso (Hoyoverse)</div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 20px;">
-          <div class="pe-grp"><label class="pe-lbl">ltuid_v2</label><input type="password" class="pe-inp" x-model="$store.cloud.ltuid" :disabled="$store.cloud.locked"></div>
-          <div class="pe-grp"><label class="pe-lbl">ltoken_v2</label><input type="password" class="pe-inp" x-model="$store.cloud.ltoken" :disabled="$store.cloud.locked"></div>
-        </div>
-
-        <div class="pblock-title">Identificadores de Jogo (UID)</div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom: 20px;">
-          <div class="pe-grp"><label class="pe-lbl">Genshin</label><input type="text" class="pe-inp" placeholder="Opcional" x-model="$store.cloud.uidGs" :disabled="$store.cloud.locked"></div>
-          <div class="pe-grp"><label class="pe-lbl">Star Rail</label><input type="text" class="pe-inp" placeholder="Opcional" x-model="$store.cloud.uidHsr" :disabled="$store.cloud.locked"></div>
-          <div class="pe-grp"><label class="pe-lbl">Zenless</label><input type="text" class="pe-inp" placeholder="Opcional" x-model="$store.cloud.uidZzz" :disabled="$store.cloud.locked"></div>
-        </div>
-
-        <button class="btn-post" @click="$store.cloud.performSync()" x-show="!$store.cloud.locked">✓ Salvar na Nuvem</button>
-        <button class="btn-small" @click="$store.cloud.locked = false" x-show="$store.cloud.locked">✎ Editar Dados</button>
-        <div style="margin-top: 15px; font-size: 0.75rem; text-align: center;" :style="'color:' + $store.cloud.statusColor" x-text="$store.cloud.statusMsg"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    document.addEventListener('alpine:init', () => {
-      Alpine.store('app', {
-        activePage: 'tracker', activeGame: null, activeTab: 'status', charDb: {},
-        games:[
-          { id: "genshin", name: "Genshin Impact", short: "Genshin", max: 90, soft: 74, img: "https://i.ibb.co/60Ls3TmQ/5d2ba4371115d26de4c574b28311aed8-576844151847376526.jpg", apiCode: "gs" },
-          { id: "hsr", name: "Honkai: Star Rail", short: "Star Rail", max: 90, soft: 74, img: "https://i.ibb.co/0VFgQHtT/3c862d085db721a5625b6e12649399bc-8067514115196038699.png", apiCode: "hsr" },
-          { id: "zzz", name: "Zenless Zone Zero", short: "Zenless", max: 90, soft: 74, img: "https://i.ibb.co/WZs6LX2/3ba9a74bbed3272ff0a14e861e1e8418-8953409163702722405.png", apiCode: "zzz" },
-          { id: "endfield", name: "Arknights: Endfield", short: "Endfield", max: 80, soft: 60, img: "https://i.ibb.co/G4qpXB2x/arknightsendfield-1ecp7.png", apiCode: null },
-        ],
-        get currentGameObj() { return this.games.find(g => g.id === this.activeGame); },
-        selectGame(id) { 
-            this.activeGame = id; Alpine.store('tracker').prefillForm(); Alpine.store('countdown').loadFor(id);
-            if(this.activeTab === 'banner') Alpine.store('banners').fetchData(false);
-        },
-        
-        // RESTAURADO: Leitura Bruta e à prova de falhas do seu código original
-        async fetchCharDb() {
-            const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm5Kk3LdPMBgYh17C6PQrRX_xI1G6KG8xv2Ubh9GhfKjBzig0oaJUZZ7P5BDy0-Eh1Lm4icCiYQeYr/pub?output=csv";
-            const proxies =[ u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) ];
-            
-            for (let getUrl of proxies) {
-                try {
-                    const res = await fetch(getUrl(csvUrl));
-                    if(!res.ok) continue;
-                    const text = await res.text();
-                    const lines = text.split('\n');
-                    
-                    for(let i = 1; i < lines.length; i++) {
-                        const row = lines[i];
-                        if(!row) continue;
-                        let parts =[], cur = "", inQ = false;
-                        for(let c of row) {
-                            if(c === '"') inQ = !inQ;
-                            else if(c === ',' && !inQ) { parts.push(cur.trim()); cur = ""; }
-                            else cur += c;
-                        }
-                        parts.push(cur.trim());
-                        parts = parts.map(p => p.replace(/^"|"$/g, "").trim());
-                        
-                        if(parts.length >= 3 && parts[1] && parts[2]) {
-                            this.charDb[parts[1].toLowerCase()] = parts[2];
-                        }
-                    }
-                    break; // Deu certo, para de tentar outros proxies
-                } catch(e) {}
-            }
-        },
-        getCharIcon(name) { return this.charDb[(name||'').toLowerCase()] || 'https://placehold.co/44x44/131a28/7080a0?text=?'; }
+          <!-- 4. TAB: ESTATÍSTICAS E COMPARAÇÃO -->
+          <div id="gtab-${g.id}-stats" class="gtab-content">
+              <div id="stats-render-zone-${g.id}"></div>
+          </div>
+        `;
+        wrap.appendChild(div);
       });
+    }
 
-      Alpine.store('tracker', {
-        userData: { genshin: { pity: {}, history:[] }, hsr: { pity: {}, history:[] }, zzz: { pity: {}, history:[] }, endfield: { pity: {}, history:[] } },
-        form: { char: '', pullPity: '', curPity: '', fifty: '' },
-        init() { Alpine.store('app').games.forEach(g => { const p=localStorage.getItem("gt_"+g.id+"_pity"); const h=localStorage.getItem("gt_"+g.id+"_history"); if(p) this.userData[g.id].pity=JSON.parse(p); if(h) this.userData[g.id].history=JSON.parse(h); }); },
-        get currentPity() { return this.userData[Alpine.store('app').activeGame]?.pity; },
-        get currentHistory() { return this.userData[Alpine.store('app').activeGame]?.history ||[]; },
-        get reversedHistory() { return [...this.currentHistory].reverse(); },
-        get progressPercent() { const g = Alpine.store('app').currentGameObj; return Math.min(100, Math.round(((this.currentPity?.curPity||0)/(g?.max||90))*100)); },
-        get progressColor() { const g = Alpine.store('app').currentGameObj; return (this.currentPity?.curPity||0)>=(g?.soft||74) ? 'var(--gold)' : 'var(--accent)'; },
-        get averagePity() { if(!this.currentHistory.length) return 0; return (this.currentHistory.reduce((a, b) => a+(b.pullPity||0), 0)/this.currentHistory.length).toFixed(1); },
-        get worstPity() { if(!this.currentHistory.length) return 0; return Math.max(...this.currentHistory.map(h => h.pullPity||0)); },
-        get winRate() { const v = this.currentHistory.filter(h => h.fifty==='W'||h.fifty==='L'); if(!v.length) return 0; return Math.round((v.filter(h => h.fifty==='W').length/v.length)*100); },
-        prefillForm() { const p = this.currentPity; this.form.char=p?.char||''; this.form.pullPity=p?.pullPity||''; this.form.curPity=p?.curPity||0; this.form.fifty=p?.fifty||'W'; },
-        savePull(push) {
-          if (!this.form.char || !this.form.pullPity || !this.form.fifty) { alert("Preencha todos os campos do pull!"); return; }
-          const id = Alpine.store('app').activeGame; const pull = { char: this.form.char, pullPity: parseInt(this.form.pullPity), curPity: parseInt(this.form.curPity), fifty: this.form.fifty, date: new Date().toLocaleDateString("pt-BR") };
-          this.userData[id].pity = pull; if(push) this.userData[id].history.unshift(pull);
-          localStorage.setItem("gt_"+id+"_pity", JSON.stringify(pull)); localStorage.setItem("gt_"+id+"_history", JSON.stringify(this.userData[id].history));
-          Alpine.store('monthly').calculate(); Alpine.store('cloud').silentlySaveToCloud();
-        },
-        deleteHistory(index) {
-          const id = Alpine.store('app').activeGame; this.userData[id].history.splice(index, 1);
-          this.userData[id].pity = this.userData[id].history.length>0 ? this.userData[id].history[0] : { curPity: 0 };
-          localStorage.setItem("gt_"+id+"_history", JSON.stringify(this.userData[id].history)); localStorage.setItem("gt_"+id+"_pity", JSON.stringify(this.userData[id].pity));
-          this.prefillForm(); Alpine.store('monthly').calculate(); Alpine.store('cloud').silentlySaveToCloud();
-        },
-        getColorClass(v) { return v<50 ? "c-g" : v<=70 ? "c-y" : "c-r"; }, getFiftyColor(v) { return v==='W'?'var(--green)':v==='G'?'var(--gold)':'var(--red)'; }, getFiftyLabel(v) { return v==='W'?'W (Ganhou)':v==='G'?'G (Garantido)':v==='L'?'L (Perdeu)':'—'; }, getTimelineColor(v) { return v==='W'?'tl-W':v==='L'?'tl-L':'tl-G'; }, getTimelineBgColor(v) { return v==='W'?'tl-bg-W':v==='L'?'tl-bg-L':'tl-bg-G'; }
+    // ==========================================
+    // LÓGICA DE NAVEGAÇÃO E JOGOS
+    // ==========================================
+    function switchPage(name) {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+      const p = document.getElementById("page-" + name);
+      const t = document.getElementById("ntab-" + name);
+      if (p) p.classList.add("active");
+      if (t) t.classList.add("active");
+
+      if (name === "monthly") renderMonthlySummary();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function selectGame(id) {
+      if (!id) return;
+      activeGame = id;
+      document.body.setAttribute("data-game", id);
+
+      const bg = document.getElementById("main-panel-bg");
+      const overlay = document.getElementById("main-panel-bg-overlay");
+      if (IMG[id]) {
+        bg.style.backgroundImage = `url('${IMG[id]}')`;
+        bg.style.opacity = "1";
+        overlay.style.opacity = "1";
+      }
+
+      document.querySelectorAll(".game-card").forEach(c => c.classList.remove("active"));
+      document.getElementById("gc-" + id).classList.add("active");
+      document.getElementById("welcome-screen").style.display = "none";
+      document.querySelectorAll(".game-panel").forEach(p => p.classList.remove("active"));
+
+      const panel = document.getElementById("gp-" + id);
+      if (panel) panel.classList.add("active");
+
+      prefillForm(id);
+      updateLiveStatusUI();
+    }
+
+    function switchGameTab(gameId, tabId, btn) {
+      document.querySelectorAll(`#gp-${gameId} .gtab-content`).forEach(t => t.classList.remove('active'));
+      btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+
+      document.getElementById(`gtab-${gameId}-${tabId}`).classList.add('active');
+      btn.classList.add('active');
+
+      if (tabId === 'stats') renderGameStatsView(gameId);
+    }
+
+    function togglePull(id) {
+      const col = document.getElementById("pull-col-" + id);
+      const btn = document.getElementById("ptbtn-" + id);
+      const isOpen = col.classList.toggle("open");
+      if (isOpen) btn.querySelector('.chev').style.transform = "rotate(180deg)";
+      else btn.querySelector('.chev').style.transform = "rotate(0deg)";
+    }
+
+    // ==========================================
+    // PITY LOGIC & TIMELINE RENDER
+    // ==========================================
+    function selFifty(gameId, val) {
+      fiftyState[gameId] = val;
+      document.querySelectorAll("#rr-" + gameId + " .ropt").forEach(el => {
+        el.className = "ropt" + (el.dataset.val === val ? " s" + val : "");
       });
+    }
 
-      Alpine.store('countdown', {
-        targetTs: 0, timerObj: null, d: '--', h: '--', m: '--', s: '--', isDone: false, formDate: '',
-        loadFor(id) { if(this.timerObj) clearInterval(this.timerObj); const ts = localStorage.getItem("gt_"+id+"_ts"); this.targetTs = ts?parseInt(ts):0; this.update(); this.timerObj = setInterval(()=>this.update(), 1000); },
-        saveDate() { if(!this.formDate) return; const ts = new Date(this.formDate).getTime(); localStorage.setItem("gt_"+Alpine.store('app').activeGame+"_ts", ts); this.loadFor(Alpine.store('app').activeGame); },
-        update() { if(this.targetTs<=0) { this.isDone=false; return; } const diff = this.targetTs - Date.now(); if (diff<=0) { this.d=0; this.h=0; this.m=0; this.s=0; this.isDone=true; clearInterval(this.timerObj); return; } this.isDone=false; const t=Math.floor(diff/1000); this.s=String(t%60).padStart(2,'0'); this.m=String(Math.floor(t/60)%60).padStart(2,'0'); this.h=String(Math.floor(t/3600)%24).padStart(2,'0'); this.d=String(Math.floor(t/86400)).padStart(2,'0'); }
-      });
+    function prefillForm(id) {
+      const d = S.get(id + "_pity", null);
+      if (!d) return;
+      if (document.getElementById("pei-char-" + id)) document.getElementById("pei-char-" + id).value = d.char || "";
+      if (document.getElementById("pei-pp-" + id)) document.getElementById("pei-pp-" + id).value = d.pullPity || "";
+      if (document.getElementById("pei-cur-" + id)) document.getElementById("pei-cur-" + id).value = d.curPity || "";
+      if (d.fifty) selFifty(id, d.fifty);
+    }
 
-      Alpine.store('banners', {
-        isLoading: false, liveData: {}, futureData: {},
-        get currentLive() { return this.liveData[Alpine.store('app').activeGame]||[]; }, get currentFuture() { return this.futureData[Alpine.store('app').activeGame]||[]; },
-        
-        async fetchData(force) {
-          const id = Alpine.store('app').activeGame; if(!id) return;
-          const kL = `gt_live_${id}`; const kF = `gt_future_${id}`;
-          
-          if (!force && localStorage.getItem(kL) && localStorage.getItem(kF)) {
-            const cacheObj = JSON.parse(localStorage.getItem(kL));
-            if (Date.now() - cacheObj.time < 43200000) {
-               this.liveData[id] = cacheObj.items; 
-               this.futureData[id] = JSON.parse(localStorage.getItem(kF)).items; 
-               return;
-            }
-          }
-          
-          this.isLoading = true;
-          
-          // FETCH: BANNERS ATUAIS (API Ennead)
-          try {
-             let ch=[];
-             if(id==='genshin'){ const d=await(await fetch("https://api.ennead.cc/mihoyo/genshin/calendar")).json(); d.banners?.forEach(b=>b.characters?.forEach(c=>{if(c.rarity===5)ch.push(c);})); }
-             else if(id==='hsr'){ const d=await(await fetch("https://api.ennead.cc/mihoyo/starrail/calendar")).json(); const now=Math.floor(Date.now()/1000); const act=d.banners?.filter(b=>b.start_time<=now&&b.end_time>=now)||[]; act.forEach(b=>b.characters?.forEach(c=>{if(c.rarity===5)ch.push(c);})); }
-             const unq=[]; const sn=new Set(); ch.forEach(c=>{if(!sn.has(c.name)){sn.add(c.name);unq.push(c);}});
-             this.liveData[id]=unq; localStorage.setItem(kL, JSON.stringify({time: Date.now(), items: unq}));
-          } catch(e) {}
-          
-          // RESTAURADO: FETCH BANNERS FUTUROS (Google Sheets)
-          const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbrSRKrBSYS2JrFdRmx6HZOM0LgaWX5YStUUXbaKkVhlCqDyK1GmKHRw_vfvJQpO0aDZW1quGLZYMy/pub?output=csv";
-          const proxies =[ u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) ];
-          
-          for(let getUrl of proxies) {
-              try {
-                  const res = await fetch(getUrl(csvUrl));
-                  if(!res.ok) continue;
-                  const text = await res.text();
-                  const lines = text.replace(/\r/g, "").split('\n'); 
-                  let f = {genshin:[], hsr:[], zzz:[], endfield:[]};
-                  
-                  for(let i=1; i<lines.length; i++) {
-                      if(!lines[i].trim()) continue;
-                      let parts =[], cur = "", inQ = false;
-                      for(let c of lines[i]) {
-                          if(c === '"') inQ = !inQ;
-                          else if(c === ',' && !inQ) { parts.push(cur.trim()); cur = ""; }
-                          else cur += c;
-                      }
-                      parts.push(cur.trim());
-                      parts = parts.map(p => p.replace(/^"|"$/g, "").trim());
-                      
-                      // Preenche até 28 posições para evitar erros de array index out of bounds
-                      while(parts.length < 28) parts.push(""); 
-                      
-                      if(parts[0]) f.genshin.push({name:parts[0], icon:parts[1], traits:[parts[2],parts[3]], ver:parts[4], rerun:parts[5].toUpperCase()==="TRUE"});
-                      if(parts[7]) f.hsr.push({name:parts[7], icon:parts[8], traits:[parts[9],parts[10]], ver:parts[11], rerun:parts[12].toUpperCase()==="TRUE"});
-                      if(parts[14]) f.zzz.push({name:parts[14], icon:parts[15], traits:[parts[16],parts[17]], ver:parts[18], rerun:parts[19].toUpperCase()==="TRUE"});
-                      if(parts[21]) f.endfield.push({name:parts[21], icon:parts[22], traits:[parts[23],parts[24],parts[25]], ver:parts[26], rerun:parts[27].toUpperCase()==="TRUE"});
-                  }
-                  
-                  Object.keys(f).forEach(k => { 
-                      this.futureData[k] = f[k]; 
-                      localStorage.setItem(`gt_future_${k}`, JSON.stringify({time: Date.now(), items: f[k]})); 
-                  });
-                  break; // Deu certo, sai do proxy loop
-              } catch(e) {}
-          }
-          this.isLoading = false;
+    function refreshPity(id) {
+      const d = S.get(id + "_pity", null);
+      const g = GAMES.find(x => x.id === id);
+      const setv = (sfx, txt, cls) => {
+        const e = document.getElementById("pc-" + sfx + "-" + id);
+        if (e) { e.textContent = txt; e.className = "pc-val" + (sfx === "char" || sfx === "ft" ? " sm " : "  ") + (cls || ""); }
+      };
+      if (!d) {
+        setv("char", "—", "c-p"); setv("pp", "—", ""); setv("ft", "—", "c-m"); setv("cur", "—", "");
+        if (document.getElementById("pb-" + id)) document.getElementById("pb-" + id).style.width = "0%";
+        return;
+      }
+      setv("char", d.char || "—", "c-p");
+      setv("pp", d.pullPity != null ? String(d.pullPity) : "—", ppCls(d.pullPity || 0));
+      setv("ft", d.fifty ? ftLbl(d.fifty) : "—", d.fifty ? ftCls(d.fifty) : "c-m");
+      setv("cur", d.curPity != null ? String(d.curPity) : "—", curCls(d.curPity || 0));
+
+      const bar = document.getElementById("pb-" + id);
+      const lbl = document.getElementById("pblbl-" + id);
+      if (bar && g) {
+        const cur = d.curPity || 0;
+        const pct = Math.min(100, Math.round(cur / g.max * 100));
+        bar.style.width = pct + "%";
+        const isSoft = cur >= g.soft;
+        bar.style.background = isSoft ? "var(--gold)" : "var(--accent)";
+        if (lbl) lbl.innerHTML = `<span>${cur} / ${g.max}${isSoft ? " · Soft Pity!" : ""}</span>`;
+      }
+    }
+
+    function postPull(id) {
+      const char = (document.getElementById("pei-char-" + id).value || "").trim();
+      const pp = parseInt(document.getElementById("pei-pp-" + id).value);
+      const cur = parseInt(document.getElementById("pei-cur-" + id).value);
+      const fifty = fiftyState[id];
+      const hint = document.getElementById("peh-" + id);
+
+      if (!char || isNaN(pp) || isNaN(cur) || !fifty) {
+        hint.textContent = "Preencha todos os campos!"; hint.style.color = "var(--red)"; return;
+      }
+
+      S.set(id + "_pity", { char, pullPity: pp, curPity: cur, fifty });
+      const hist = S.get(id + "_history", []);
+      hist.unshift({ char, pullPity: pp, curPity: cur, fifty, date: new Date().toLocaleDateString("pt-BR") });
+      S.set(id + "_history", hist);
+
+      refreshPity(id); renderHistory(id); renderTimeline(id);
+      autoSaveToCloud();
+
+      hint.textContent = "Salvo com sucesso!"; hint.style.color = "var(--green)";
+      setTimeout(() => hint.textContent = "", 3000);
+    }
+
+    function editOnly(id) {
+      const char = (document.getElementById("pei-char-" + id).value || "").trim();
+      const pp = parseInt(document.getElementById("pei-pp-" + id).value);
+      const cur = parseInt(document.getElementById("pei-cur-" + id).value);
+      const fifty = fiftyState[id];
+      if (!char || isNaN(pp) || isNaN(cur) || !fifty) return;
+
+      S.set(id + "_pity", { char, pullPity: pp, curPity: cur, fifty });
+      refreshPity(id);
+      autoSaveToCloud();
+    }
+
+    function renderHistory(id) {
+      const hist = S.get(id + "_history", []);
+      const el = document.getElementById("hist-" + id);
+      if (!el) return;
+      if (!hist.length) { el.innerHTML = '<div class="hist-empty">Nenhum pull registrado.</div>'; return; }
+
+      el.innerHTML = hist.slice(0, MAX_HIST).map((h, i) => {
+        const ppC = ppCls(h.pullPity || 0);
+        const ftC = h.fifty === "W" ? "var(--green)" : h.fifty === "G" ? "var(--gold)" : "var(--red)";
+        return `
+          <div class="hist-item">
+            <span class="hist-n">#${hist.length - i}</span>
+            <span class="hist-name">${esc(h.char || "—")}</span>
+            <span class="hist-pp ${ppC}">Pity ${h.pullPity ?? '?'}</span>
+            <span class="hist-ft" style="color:${ftC}">${ftShort(h.fifty || "")}</span>
+            <button class="btn-del-hist" onclick="deleteHistoryItem('${id}', ${i})">X</button>
+          </div>`;
+      }).join("");
+    }
+
+    function deleteHistoryItem(id, index) {
+      if (!confirm("Deseja excluir este pull?")) return;
+      let hist = S.get(id + "_history", []);
+
+      if (index === 0) {
+        if (hist.length > 1) {
+          const prev = hist[1];
+          S.set(id + "_pity", { char: prev.char, pullPity: prev.pullPity, curPity: prev.curPity, fifty: prev.fifty });
+        } else {
+          localStorage.removeItem("gt_" + id + "_pity");
         }
+      }
+      hist.splice(index, 1);
+      S.set(id + "_history", hist);
+      refreshPity(id); renderHistory(id); renderTimeline(id); prefillForm(id);
+      autoSaveToCloud();
+    }
+
+    function renderTimeline(id) {
+      const el = document.getElementById(`timeline-${id}`);
+      if (!el) return;
+      const hist = S.get(id + "_history", []);
+
+      if (!hist.length) {
+        el.innerHTML = '<div style="color:var(--muted); font-size:0.8rem; text-align:center; padding: 20px;">Nenhum pull registrado para criar o gráfico.</div>';
+        return;
+      }
+
+      const chron = [...hist].reverse();
+      let html = `<div class="timeline-track">`;
+
+      chron.forEach(h => {
+        const px = (h.pullPity || 0) * 3;
+        const img = window.charDb[(h.char || "").toLowerCase()] || 'https://via.placeholder.com/44?text=?';
+        const colorCls = h.fifty ? `tl-${h.fifty}` : 'tl-W';
+        const bgCls = h.fifty ? `tl-bg-${h.fifty}` : 'tl-bg-W';
+
+        html += `
+                <div class="timeline-line" style="width: ${px}px;"></div>
+                <div class="timeline-node">
+                    <span class="timeline-pity ${colorCls}">${h.pullPity}</span>
+                    <img src="${img}" class="timeline-img ${colorCls}" title="${h.char}">
+                    <div class="timeline-point ${bgCls}"></div>
+                    <span class="timeline-name">${h.char}</span>
+                </div>
+            `;
+      });
+      html += `</div>`;
+      el.innerHTML = html;
+    }
+
+    // ==========================================
+    // ESTATÍSTICAS E COMPARAÇÃO
+    // ==========================================
+    function renderGameStatsView(id) {
+      const area = document.getElementById("stats-render-zone-" + id);
+      if (!area) return;
+      area.innerHTML = `
+            ${generateSingleStatHTML(id)}
+            <div style="background: var(--card3); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-top: 20px; display:flex; align-items:center; gap: 15px;">
+                <span style="font-family: Rajdhani; font-weight: 700; color: var(--accent);">COMPARAÇÃO:</span>
+                <select onchange="startGameComparison('${id}', this.value)" style="flex:1; padding: 8px; border-radius: 6px; background: var(--card2); color: var(--text); border: 1px solid var(--border); outline: none;">
+                    <option value="">Escolha um jogo para comparar a sua sorte...</option>
+                    ${GAMES.filter(g => g.id !== id).map(g => `<option value="${g.id}">${g.name}</option>`).join("")}
+                </select>
+            </div>
+            <div id="comparison-result-${id}" style="margin-top: 15px;"></div>
+        `;
+    }
+
+    function generateSingleStatHTML(id) {
+      const g = GAMES.find(x => x.id === id);
+      const hist = S.get(id + "_history", []);
+      const themeColor = GAME_THEME_COLORS[g.name] || "var(--accent)";
+
+      if (hist.length === 0) return `<div class="pblock" style="text-align:center; color:var(--muted2);">Sem dados em ${g.short}.</div>`;
+
+      const avg = (hist.reduce((s, h) => s + (h.pullPity || 0), 0) / hist.length).toFixed(1);
+      const wins = hist.filter(h => h.fifty === "W").length;
+      const loss = hist.filter(h => h.fifty === "L").length;
+      const mx = hist.reduce((a, b) => (b.pullPity || 0) > (a.pullPity || 0) ? b : a, hist[0]);
+
+      return `
+            <div class="pblock" style="border-color: ${themeColor}66; background: ${themeColor}05; padding: 15px; margin-bottom: 0;">
+                <div style="color: ${themeColor}; font-size: 0.75rem; font-weight: 700; margin-bottom: 12px; font-family:'Rajdhani'; letter-spacing:0.1em;">${g.short.toUpperCase()} STATS</div>
+                <div class="stats-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 10px;">
+                    <div class="sc"><span class="sc-num">${hist.length}</span><span class="sc-lbl">Pulls Totais</span></div>
+                    <div class="sc"><span class="sc-num" style="color: ${avg > 60 ? 'var(--gold)' : 'var(--green)'};">${avg}</span><span class="sc-lbl">Pity Médio</span></div>
+                    <div class="sc"><span class="sc-num c-g">${wins}W / ${loss}L</span><span class="sc-lbl">Sorte 50/50</span></div>
+                    <div class="sc"><span class="sc-num c-r">${mx.pullPity}</span><span class="sc-lbl">Pior Pity (${mx.char})</span></div>
+                </div>
+            </div>`;
+    }
+
+    function startGameComparison(baseId, targetId) {
+      const res = document.getElementById("comparison-result-" + baseId);
+      if (!targetId) { res.innerHTML = ""; return; }
+      res.innerHTML = `
+            <div class="comp-grid">
+                <div>${generateSingleStatHTML(baseId)}</div>
+                <div class="vs-text" style="display:flex; align-items:center; justify-content:center; font-family:Rajdhani; font-weight:700; font-size:1.5rem; color:var(--accent);">VS</div>
+                <div>${generateSingleStatHTML(targetId)}</div>
+            </div>
+        `;
+    }
+
+    // ==========================================
+    // AUTO-COUNTDOWNS (NOVO FETCH DA API ENNEAD)
+    // ==========================================
+    async function fetchAutoCountdowns() {
+      const now = Math.floor(Date.now() / 1000);
+
+      // Genshin
+      try {
+        const resG = await fetch("https://api.ennead.cc/mihoyo/genshin/calendar");
+        const dataG = await resG.json();
+        const activeG = (dataG.banners || []).filter(b => b.start_time <= now && b.end_time >= now);
+        if (activeG.length) {
+          const endTs = Math.max(...activeG.map(b => b.end_time));
+          startCountdown("genshin", endTs * 1000);
+          S.set("genshin_ts", endTs * 1000);
+        }
+      } catch (e) { }
+
+      // HSR
+      try {
+        const resH = await fetch("https://api.ennead.cc/mihoyo/starrail/calendar");
+        const dataH = await resH.json();
+        const activeH = (dataH.banners || []).filter(b => b.start_time <= now && b.end_time >= now);
+        if (activeH.length) {
+          const endTs = Math.max(...activeH.map(b => b.end_time));
+          startCountdown("hsr", endTs * 1000);
+          S.set("hsr_ts", endTs * 1000);
+        }
+      } catch (e) { }
+    }
+
+    // ==========================================
+    // COUNTDOWN MANUAL / FALLBACK
+    // ==========================================
+    function toggleCfg(id) {
+      const p = document.getElementById("cfg-" + id);
+      p.classList.toggle("open");
+    }
+
+    function applyDate(id) {
+      const val = document.getElementById("dt-" + id).value;
+      if (!val) return;
+      const ts = new Date(val).getTime();
+      S.set(id + "_ts", ts);
+      document.getElementById("cfg-" + id).classList.remove("open");
+      startCountdown(id, ts);
+    }
+
+    function startCountdown(id, targetTs) {
+      if (timers[id]) clearInterval(timers[id]);
+      const sd = document.getElementById("stxt-" + id);
+      if (sd) sd.textContent = "Fim: " + new Date(targetTs).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+      function tick() {
+        const diff = targetTs - Date.now();
+        const blk = document.getElementById("cdb-" + id);
+        const stxt = document.getElementById("stxt-" + id);
+
+        if (diff <= 0) {
+          setNums(id, 0, 0, 0, 0, "done");
+          if (blk) blk.classList.add("is-done");
+          if (stxt) { stxt.textContent = "✦ Update disponível!"; stxt.style.color = "var(--gold)"; }
+          clearInterval(timers[id]);
+          return;
+        }
+
+        if (blk) blk.classList.remove("is-done");
+        const tot = Math.floor(diff / 1000);
+        const s = tot % 60, m = Math.floor(tot / 60) % 60, h = Math.floor(tot / 3600) % 24, d = Math.floor(tot / 86400);
+        setNums(id, d, h, m, s, (d * 24 + h) < 2 ? "urgent" : (d * 24 + h) < 24 ? "soon" : "");
+      }
+      tick(); timers[id] = setInterval(tick, 1000);
+    }
+
+    function setNums(id, d, h, m, s, cls) {
+      ["d", "h", "m", "s"].forEach((k, i) => {
+        const el = document.getElementById(id + "-" + k);
+        if (!el) return; el.textContent = pad([d, h, m, s][i]);
+      });
+    }
+
+    // ==========================================
+    // PROMO CODES (NOVO)
+    // ==========================================
+    async function fetchCodes() {
+      const endpoints = {
+        genshin: "https://api.ennead.cc/mihoyo/genshin/codes",
+        hsr: "https://api.ennead.cc/mihoyo/starrail/codes",
+        zzz: "https://api.ennead.cc/mihoyo/zenless/codes"
+      };
+
+      for (const [game, url] of Object.entries(endpoints)) {
+        const el = document.getElementById("codes-list-" + game);
+        if (!el) continue;
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+          if (data && data.active && data.active.length > 0) {
+            el.innerHTML = `<div style="display:flex; flex-wrap:wrap; gap:8px;">` +
+              data.active.map(c => `
+                            <div style="background:var(--card3); border:1px solid var(--border); padding:6px 10px; border-radius:6px; display:flex; align-items:center; gap:10px;">
+                                <span style="font-family:'Rajdhani', sans-serif; font-weight:700; color:var(--text); font-size:0.9rem; letter-spacing:0.05em;">${c.code}</span>
+                                <button onclick="navigator.clipboard.writeText('${c.code}'); this.innerHTML='✓'; this.style.color='var(--green)'; setTimeout(()=>{this.innerHTML='Copiar'; this.style.color='var(--accent)'}, 2000);" style="background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:4px; color:var(--accent); font-size:0.6rem; padding:3px 6px; cursor:pointer; text-transform:uppercase; font-weight:bold; transition:0.2s;">Copiar</button>
+                            </div>
+                        `).join("") +
+              `</div>`;
+          } else {
+            el.innerHTML = `<span style="font-size:0.7rem; color:var(--muted)">Nenhum código ativo encontrado no momento.</span>`;
+          }
+        } catch (e) {
+          el.innerHTML = `<span style="font-size:0.7rem; color:var(--red)">Erro ao carregar códigos.</span>`;
+        }
+      }
+    }
+
+
+    // ==========================================
+    // BANNER FETCH (API / GOOGLE SHEETS) + FUTUROS
+    // ==========================================
+    async function loadBanners(force) {
+      if (bannerLoaded && !force) return;
+      bannerLoaded = true;
+
+      GAMES.forEach(g => {
+        const btn = document.getElementById("btn-refresh-" + g.id);
+        if (btn) btn.innerHTML = "Atualizando...";
       });
 
-      Alpine.store('cloud', {
-        syncId: localStorage.getItem('gt_sync_label') || '', 
-        ltuid: '', ltoken: '', uidGs: '', uidHsr: '', uidZzz: '',
-        locked: !!localStorage.getItem('gt_sync_label'),
-        statusMsg: '', statusColor: 'var(--muted2)',
-        isFetching: false, liveDataCache: null, lastFetchTime: 0,
-        syncBtnText: 'Sincronizar Conta Agora',
-        
-        async init() {
-            if(this.syncId) {
-                try {
-                    const res = await fetch(`https://gacha-tracker-priv.onrender.com/data/${encodeURIComponent(this.syncId)}`);
-                    const acc = await res.json();
-                    if(acc && !acc.error) {
-                        this.ltuid = acc.ltuid_v2 || ""; this.ltoken = acc.ltoken_v2 || "";
-                        this.uidGs = acc.uid_gs || ""; this.uidHsr = acc.uid_hsr || ""; this.uidZzz = acc.uid_zzz || "";
-                    }
-                } catch(e) {}
+      const spin = `<div class="bload"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg><br>Carregando...</div>`;["genshin", "hsr", "zzz", "endfield"].forEach(g => { const el = document.getElementById("bch-" + g); if (el) el.innerHTML = spin; });
+
+      const cc = (c, i) => `<div class="bchar" style="animation-delay:${i * .07}s"><img src="${esc(c.icon)}" alt="${esc(c.name)}" onerror="this.style.display='none'"><div><div class="bchar-name">${esc(c.name)}</div><div class="bchar-stars">★★★★★</div><span class="bbadge">5★ · Banner Atual</span></div></div>`;
+
+      const pGenshin = (async () => {
+        try {
+          const d = await (await fetch("https://api.ennead.cc/mihoyo/genshin/calendar")).json();
+          const seen = new Set(); const chars = [];
+          const now = Math.floor(Date.now() / 1000);
+          (d.banners || []).forEach(b => {
+            if (b.start_time <= now && b.end_time >= now) {
+              (b.characters || []).forEach(c => {
+                if (c.rarity === 5 && !seen.has(c.name)) { seen.add(c.name); chars.push(c); }
+              });
             }
-        },
+          });
+          const el = document.getElementById("bch-genshin");
+          if (el) el.innerHTML = chars.length ? chars.map(cc).join("") : '<div class="bload" style="color:var(--muted)">Sem 5★ ativo.</div>';
+        } catch {
+          const el = document.getElementById("bch-genshin"); if (el) el.innerHTML = '<div class="berr">Erro ao carregar.</div>';
+        }
+      })();
 
-        get lastUpdateText() { if(this.lastFetchTime===0) return "Nunca sincronizado"; const d = new Date(this.lastFetchTime); return `Visto às ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; },
-        get currentLiveStats() { const g = Alpine.store('app').currentGameObj; return g?.apiCode ? this.liveDataCache?.[g.apiCode] : null; },
-        
-        async performSync() {
-            if(!this.syncId) return;
-            this.statusMsg = "Enviando dados para o servidor..."; this.statusColor = "var(--gold)";
-            const siteDataObj = {};
-            Object.keys(localStorage).filter(k => k.startsWith('gt_') && k !== 'gt_sync_label').forEach(k => siteDataObj[k] = localStorage.getItem(k));
-            
-            const payload = { ltuid_v2: this.ltuid, ltoken_v2: this.ltoken, uid_gs: this.uidGs, uid_hsr: this.uidHsr, uid_zzz: this.uidZzz, siteData: JSON.stringify(siteDataObj) };
+      const pHSR = (async () => {
+        try {
+          const d = await (await fetch("https://api.ennead.cc/mihoyo/starrail/calendar")).json();
+          const now = Math.floor(Date.now() / 1000);
+          const active = (d.banners || []).filter(b => b.start_time <= now && b.end_time >= now && (b.characters || []).some(c => c.rarity === 5));
+          const maxStart = active.length ? Math.max(...active.map(b => b.start_time)) : null;
+          const currentPhase = active.filter(b => b.start_time === maxStart);
+          const seen = new Set();
+          const chars = [];
+          currentPhase.forEach(b => (b.characters || []).forEach(c => {
+            if (c.rarity === 5 && !seen.has(c.name)) { seen.add(c.name); chars.push(c); }
+          }));
+          const el = document.getElementById("bch-hsr");
+          if (el) el.innerHTML = chars.length ? chars.map(cc).join("") : '<div class="bload" style="color:var(--muted)">Sem 5★ ativo.</div>';
+        } catch {
+          const el = document.getElementById("bch-hsr"); if (el) el.innerHTML = '<div class="berr">Erro ao carregar.</div>';
+        }
+      })();
 
-            try {
-                await fetch(`https://gacha-tracker-priv.onrender.com/save/${encodeURIComponent(this.syncId)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                localStorage.setItem('gt_sync_label', this.syncId); this.locked = true; 
-                this.statusMsg = "✅ Protegido e Sincronizado!"; this.statusColor = "var(--green)";
-            } catch(e) { this.statusMsg = "⚠️ Erro ao salvar."; this.statusColor = "var(--red)"; }
-        },
-
-        async silentlySaveToCloud() {
-            if(!this.syncId || !this.locked) return;
-            const siteDataObj = {};
-            Object.keys(localStorage).filter(k => k.startsWith('gt_') && k !== 'gt_sync_label').forEach(k => siteDataObj[k] = localStorage.getItem(k));
-            const payload = { ltuid_v2: this.ltuid, ltoken_v2: this.ltoken, uid_gs: this.uidGs, uid_hsr: this.uidHsr, uid_zzz: this.uidZzz, siteData: JSON.stringify(siteDataObj) };
-            try { await fetch(`https://gacha-tracker-priv.onrender.com/save/${encodeURIComponent(this.syncId)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } catch(e) {}
-        },
-
-        async forceLiveUpdate() {
-            if(!this.syncId || !Alpine.store('app').currentGameObj?.apiCode) return;
-            this.isFetching = true; this.syncBtnText = "Solicitando ao Servidor...";
-            try {
-                await fetch('https://gacha-tracker-priv.onrender.com/run'); 
-                let secs = 30;
-                const timer = setInterval(() => {
-                    secs--; this.syncBtnText = `Aguarde (${secs}s)...`;
-                    if(secs <= 0) {
-                        clearInterval(timer); this.syncBtnText = "Sincronizar Conta Agora";
-                        this.isFetching = false; this.fetchLiveStatus(true); 
-                    }
-                }, 1000);
-            } catch(e) {
-                this.syncBtnText = "Erro de conexão";
-                setTimeout(() => { this.syncBtnText = "Sincronizar Conta Agora"; this.isFetching = false; }, 3000);
+      const pZZZ = (async () => {
+        var zCsv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTDX5lZJLb8BWTQmvzV0BR-_pK8XcyVEf_CpgY32Ml-6SffuscJiZBlWS-N5Xl1sJk-oYdpTPQccWzB/pub?output=csv";
+        var zProxies = [u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u)];
+        function parseZCSV(text) {
+          function parseRow(raw) {
+            var cols = []; var cur = ""; var inQ = false;
+            for (var i = 0; i < raw.length; i++) {
+              var ch = raw[i];
+              if (ch === '"') { inQ = !inQ; }
+              else if (ch === "," && !inQ) { cols.push(cur.trim()); cur = ""; }
+              else cur += ch;
             }
-        },
+            cols.push(cur.trim());
+            return cols.map(c => c.replace(/^"|"$/g, "").trim());
+          }
+          var agents = [];
+          var lines = text.replace(/\r/g, "").split("\n");
+          for (var i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            var row = parseRow(lines[i]);
+            var name = (row[0] || "");
+            var rarity = (row[5] || "").toUpperCase();
+            var running = (row[20] || "").toUpperCase();
+            var icon = (row[21] || "").trim();
+            if (name && rarity === "S" && running === "TRUE") agents.push({ name: name, icon: icon });
+          }
+          return agents;
+        }
+        function renderZAgent(agent, i) {
+          var name = agent.name;
+          var icon = agent.icon || window.ZZZ_ICONS[name] || "";
+          var imgHtml = icon
+            ? '<img src="' + esc(icon) + '" alt="' + esc(name) + '" onerror="this.style.display=\'none\'" style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--card)">'
+            : '<div style="width:64px;height:64px;border-radius:10px;background:rgba(245,200,0,.1);border:1px solid rgba(245,200,0,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f5c800" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>';
+          return '<div class="bchar" style="animation-delay:' + (i * 0.07) + 's">' + imgHtml + '<div><div class="bchar-name">' + esc(name) + '</div><div class="bchar-stars">★★★★★</div><span class="bbadge">Agente S · Banner Atual</span></div></div>';
+        }
+        var zEl = document.getElementById("bch-zzz");
+        var zDone = false;
+        for (var zi = 0; zi < zProxies.length && !zDone; zi++) {
+          try {
+            var zResp = await fetch(zProxies[zi](zCsv), { signal: AbortSignal.timeout(9000) });
+            if (!zResp.ok) continue;
+            var zText = await zResp.text();
+            if (!zText.includes(",")) continue;
+            var zAgents = parseZCSV(zText);
+            if (zEl) zEl.innerHTML = zAgents.length ? zAgents.map((a, i) => renderZAgent(a, i)).join("") : '<div class="bload" style="color:rgba(255,255,255,.5)">Sem agente S ativo.</div>';
+            zDone = true;
+          } catch (ze) { continue; }
+        }
+        if (!zDone && zEl) zEl.innerHTML = '<div class="berr">Erro ao carregar ZZZ.<br><a href="https://zzz.rng.moe/en" target="_blank" style="color:var(--accent)">zzz.rng.moe ↗</a></div>';
+      })();
 
-        async fetchLiveStatus(force=false) {
-            if(!this.syncId || !Alpine.store('app').currentGameObj?.apiCode) return;
-            if(!force && (Date.now() - this.lastFetchTime < 600000)) return;
-            try {
-                const res = await fetch(`https://gacha-tracker-priv.onrender.com/data/${encodeURIComponent(this.syncId)}`);
-                const data = await res.json();
-                if(data.results) { this.liveDataCache = typeof data.results==='string' ? JSON.parse(data.results) : data.results; this.lastFetchTime=Date.now(); }
-            } catch(e) {}
-        },
+      const pEndfield = (async () => {
+        var efCsv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR68CkOBE-Y7l-seTQz3FMLqrZvPSDo--HJ6JMiXQ09CCoyDcxXRvErWoGiiTgyFlTHYjS5AnxYEnHb/pub?output=csv";
+        var efProxies = [u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u)];
+        function parseEfCSV(text) {
+          function parseRow(raw) {
+            var cols = []; var cur = ""; var inQ = false;
+            for (var i = 0; i < raw.length; i++) {
+              var ch = raw[i];
+              if (ch === '"') { inQ = !inQ; }
+              else if (ch === "," && !inQ) { cols.push(cur.trim()); cur = ""; }
+              else cur += ch;
+            }
+            cols.push(cur.trim());
+            return cols.map(c => c.replace(/^"|"$/g, "").trim());
+          }
+          var chars = [];
+          var lines = text.replace(/\r/g, "").split("\n");
+          for (var i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            var row = parseRow(lines[i]);
+            var name = row[0] || "";
+            var icon = row[1] || "";
+            var rarity = (row[2] || "").replace("*", "").trim();
+            var running = (row[3] || "").toUpperCase();
+            if (name && rarity === "6" && running === "TRUE") chars.push({ name: name, icon: icon });
+          }
+          return chars;
+        }
+        function renderEfChar(c, i) {
+          var delay = (i * 0.08) + "s";
+          var imgHtml = c.icon
+            ? '<img src="' + esc(c.icon) + '" alt="' + esc(c.name) + '" onerror="this.style.display=\'none\'" style="width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--card)">'
+            : '<div style="width:50px;height:50px;border-radius:8px;background:rgba(48,224,138,.1);border:1px solid rgba(48,224,138,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30e08a" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>';
+          return '<div class="bchar" style="animation-delay:' + delay + '">' + imgHtml + '<div><div class="bchar-name">' + esc(c.name) + '</div><div class="bchar-stars">★★★★★★</div><span class="bbadge">6★ · Banner Atual</span></div></div>';
+        }
+        var efEl = document.getElementById("bch-endfield");
+        var efDone = false;
+        for (var pi = 0; pi < efProxies.length && !efDone; pi++) {
+          try {
+            var efResp = await fetch(efProxies[pi](efCsv), { signal: AbortSignal.timeout(9000) });
+            if (!efResp.ok) continue;
+            var efText = await efResp.text();
+            if (!efText.includes(",")) continue;
+            var efChars = parseEfCSV(efText);
+            if (efEl) {
+              if (efChars.length) efEl.innerHTML = efChars.map(renderEfChar).join("");
+              else efEl.innerHTML = '<div class="bload" style="color:rgba(255,255,255,.5)">Nenhum personagem 6★ no banner ativo.</div>';
+            }
+            efDone = true;
+          } catch (efErr) { continue; }
+        }
+        if (!efDone && efEl) {
+          efEl.innerHTML = '<div style="padding:15px; font-size:0.75rem; color:rgba(255,255,255,0.6);">Não foi possível carregar Endfield.<br><a href="https://trackmypulls.com/en/endfield/tracker" target="_blank" style="color:var(--accent2)">→ trackmypulls.com</a></div>';
+        }
+      })();
 
-        exportData() { const obj = {}; Object.keys(localStorage).filter(k => k.startsWith("gt_")).forEach(k => obj[k.slice(3)] = JSON.parse(localStorage.getItem(k))); const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" })); a.download = "gacha-tracker-backup.json"; a.click(); URL.revokeObjectURL(a.href); },
-        importData(e) { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = ev => { try { Object.entries(JSON.parse(ev.target.result)).forEach(([k, v]) => localStorage.setItem("gt_" + k, JSON.stringify(v))); alert("Importado! A página vai recarregar."); location.reload(); } catch { alert("Erro de JSON."); } }; r.readAsText(file); e.target.value = ""; }
-      });
+      await loadFutureBanners();
 
-      Alpine.store('monthly', {
-        total5: 0, avgPity: 0, maxPity: 0, wins: 0, losses: 0, guaranteed: 0, bestGameName: "N/A", bestGameWins: 0, worstGameName: "N/A", worstGameLosses: 0, winRate: 0, currentMonthLabel: "",
-        init() { this.calculate(); },
-        calculate() {
-            const now = new Date(); const m = now.getMonth() + 1; const y = now.getFullYear(); const mNames =["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]; this.currentMonthLabel = `${mNames[now.getMonth()]} de ${y}`;
-            let t5=0, pts=[], w=0, l=0, g=0, maxP=0; let bG = {name:"Nenhum", w:-1}; let wG = {name:"Nenhum", l:-1};
-            Alpine.store('app').games.forEach(game => {
-                const hist = JSON.parse(localStorage.getItem("gt_" + game.id + "_history")||"[]"); let gW=0, gL=0;
-                hist.forEach(h => {
-                    if(!h.date) return; const[day, month, year] = h.date.split("/");
-                    if(parseInt(month)===m && parseInt(year)===y) {
-                        t5++; pts.push(h.pullPity||0); if((h.pullPity||0)>maxP) maxP=h.pullPity;
-                        if(h.fifty==='W'){ w++; gW++; } else if(h.fifty==='L'){ l++; gL++; } else if(h.fifty==='G') g++;
-                    }
-                });
-                if(gW > bG.w) bG = {name: game.name, w: gW}; if(gL > wG.l) wG = {name: game.name, l: gL};
-            });
-            this.total5=t5; this.maxPity=maxP; this.wins=w; this.losses=l; this.guaranteed=g; this.avgPity = pts.length ? (pts.reduce((a,b)=>a+b,0)/pts.length).toFixed(1) : 0; this.winRate = (w+l)>0 ? Math.round((w/(w+l))*100) : 0; this.bestGameName = w===0 ? "N/A" : bG.name; this.bestGameWins = bG.w; this.worstGameName = l===0 ? "N/A" : wG.name; this.worstGameLosses = wG.l;
-        },
-        downloadTxt() { if(this.total5===0) return alert("Sem dados."); const txt = `GACHA TRACKER - ${this.currentMonthLabel}\nTotal 5 Estrelas: ${this.total5}\nPity Médio: ${this.avgPity}\nMaior Pity: ${this.maxPity}\n\nMelhor Sorte: ${this.bestGameName} (${this.bestGameWins}W)\nMaior Azar: ${this.worstGameName} (${this.worstGameLosses}L)\n\nWinRate: ${this.winRate}%\nVitórias: ${this.wins} | Derrotas: ${this.losses} | Garantidos: ${this.guaranteed}`; const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type: "text/plain" })); a.download = `Resumo_${this.currentMonthLabel.replace(/ /g,'_')}.txt`; a.click(); URL.revokeObjectURL(a.href); }
-      });
-    });
-
-    document.addEventListener('alpine:initialized', () => {
-        Alpine.store('app').fetchCharDb(); 
-        Alpine.effect(() => {
-            const tab = Alpine.store('app').activeTab;
-            if(tab === 'banner') Alpine.store('banners').fetchData(false);
-            if(tab === 'status') Alpine.store('cloud').fetchLiveStatus(false);
+      Promise.allSettled([pGenshin, pHSR, pZZZ, pEndfield]).then(() => {
+        GAMES.forEach(g => {
+          const btn = document.getElementById("btn-refresh-" + g.id);
+          if (btn) btn.innerHTML = "Atualizar Dados de Banner Live Agora";
         });
+      });
+    }
+
+    async function loadFutureBanners() {
+      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbrSRKrBSYS2JrFdRmx6HZOM0LgaWX5YStUUXbaKkVhlCqDyK1GmKHRw_vfvJQpO0aDZW1quGLZYMy/pub?output=csv";
+      const proxies = [u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u)];
+
+      let text = "";
+      for (let getUrl of proxies) {
+        try {
+          const res = await fetch(getUrl(csvUrl));
+          if (res.ok) { text = await res.text(); break; }
+        } catch (e) { }
+      }
+      if (!text) {
+        ["genshin", "hsr", "zzz", "endfield"].forEach(id => {
+          const el = document.getElementById("future-banners-" + id);
+          if (el) el.innerHTML = '<div class="bload" style="color:var(--red)">Erro ao carregar banners futuros.</div>';
+        });
+        return;
+      }
+
+      const lines = text.replace(/\r/g, "").split("\n");
+      const futureData = { genshin: [], hsr: [], zzz: [], endfield: [] };
+
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        let parts = [], cur = "", inQ = false;
+        for (let c of lines[i]) {
+          if (c === '"') inQ = !inQ;
+          else if (c === ',' && !inQ) { parts.push(cur.trim()); cur = ""; }
+          else cur += c;
+        }
+        parts.push(cur.trim());
+        parts = parts.map(p => p.replace(/^"|"$/g, "").trim());
+
+        while (parts.length < 28) parts.push("");
+
+        if (parts[0]) futureData.genshin.push({ name: parts[0], icon: parts[1], elem: parts[2], wep: parts[3], ver: parts[4], rerun: parts[5].toUpperCase() === "TRUE" });
+        if (parts[7]) futureData.hsr.push({ name: parts[7], icon: parts[8], elem: parts[9], path: parts[10], ver: parts[11], rerun: parts[12].toUpperCase() === "TRUE" });
+        if (parts[14]) futureData.zzz.push({ name: parts[14], icon: parts[15], elem: parts[16], type: parts[17], ver: parts[18], rerun: parts[19].toUpperCase() === "TRUE" });
+        if (parts[21]) futureData.endfield.push({ name: parts[21], icon: parts[22], cls: parts[23], elem: parts[24], wep: parts[25], ver: parts[26], rerun: parts[27].toUpperCase() === "TRUE" });
+      }
+
+      renderFutureBanners('genshin', futureData.genshin);
+      renderFutureBanners('hsr', futureData.hsr);
+      renderFutureBanners('zzz', futureData.zzz);
+      renderFutureBanners('endfield', futureData.endfield);
+    }
+
+    function renderFutureBanners(gameId, data) {
+      const container = document.getElementById("future-banners-" + gameId);
+      if (!container) return;
+
+      if (data.length === 0) {
+        container.innerHTML = '<div class="bload" style="color:var(--muted)">Nenhum banner futuro registrado na planilha.</div>';
+        return;
+      }
+
+      let html = "";
+      data.forEach(c => {
+        const isRerun = c.rerun;
+        const badgeClass = isRerun ? "rerun" : "new";
+        const badgeText = isRerun ? "Rerun" : "Novo";
+
+        let charImage = c.icon;
+        if (isRerun) {
+          const dbImg = window.charDb[c.name.toLowerCase()];
+          if (dbImg) charImage = dbImg;
+        }
+        if (!charImage) charImage = 'https://via.placeholder.com/50';
+
+        let traitsHtml = "";
+        if (gameId === 'genshin') {
+          if (c.elem) traitsHtml += `<img src="${c.elem}" class="future-trait-icon" title="Elemento" onerror="this.style.display='none'">`;
+          if (c.wep) traitsHtml += `<img src="${c.wep}" class="future-trait-icon" title="Arma" onerror="this.style.display='none'">`;
+        } else if (gameId === 'hsr') {
+          if (c.elem) traitsHtml += `<img src="${c.elem}" class="future-trait-icon" title="Elemento" onerror="this.style.display='none'">`;
+          if (c.path) traitsHtml += `<img src="${c.path}" class="future-trait-icon" title="Caminho" onerror="this.style.display='none'">`;
+        } else if (gameId === 'zzz') {
+          if (c.elem) traitsHtml += `<img src="${c.elem}" class="future-trait-icon" title="Atributo" onerror="this.style.display='none'">`;
+          if (c.type) traitsHtml += `<img src="${c.type}" class="future-trait-icon" title="Estilo" onerror="this.style.display='none'">`;
+        } else if (gameId === 'endfield') {
+          if (c.cls) traitsHtml += `<img src="${c.cls}" class="future-trait-icon" title="Classe" onerror="this.style.display='none'">`;
+          if (c.elem) traitsHtml += `<img src="${c.elem}" class="future-trait-icon" title="Elemento" onerror="this.style.display='none'">`;
+          if (c.wep) traitsHtml += `<img src="${c.wep}" class="future-trait-icon" title="Arma" onerror="this.style.display='none'">`;
+        }
+
+        html += `
+            <div class="future-char">
+                <img src="${charImage}" class="future-char-icon" alt="${c.name}" onerror="this.src='https://via.placeholder.com/50'">
+                <div class="future-char-info">
+                    <div class="future-char-header">
+                        <span class="future-char-name">${c.name}</span>
+                        <span class="future-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                    <div class="future-char-traits">
+                        ${traitsHtml}
+                    </div>
+                    <div class="future-char-version">Versão ${c.ver || '???'}</div>
+                </div>
+            </div>
+            `;
+      });
+      container.innerHTML = html;
+    }
+
+    // ==========================================
+    // MONTHLY SUMMARY
+    // ==========================================
+    function getMonthlyStats() {
+      const now = new Date();
+      const m = now.getMonth() + 1;
+      const y = now.getFullYear();
+      const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+      document.getElementById('monthly-period-label').textContent = `Dados de todos os jogos em ${monthNames[now.getMonth()]} de ${y}`;
+
+      let total5 = 0, pities = [], wins = 0, losses = 0, guaranteed = 0, maxPity = 0;
+      let bestGame = { name: "Nenhum", wins: -1 };
+      let worstGame = { name: "Nenhum", losses: -1 };
+
+      GAMES.forEach(g => {
+        const hist = S.get(g.id + "_history", []);
+        let gameWins = 0, gameLosses = 0;
+        hist.forEach(h => {
+          const [day, month, year] = h.date.split("/");
+          if (parseInt(month) === m && parseInt(year) === y) {
+            total5++;
+            pities.push(h.pullPity);
+            if (h.pullPity > maxPity) maxPity = h.pullPity;
+            if (h.fifty === "W") { wins++; gameWins++; }
+            else if (h.fifty === "L") { losses++; gameLosses++; }
+            else if (h.fifty === "G") guaranteed++;
+          }
+        });
+        if (gameWins > bestGame.wins) bestGame = { name: g.name, wins: gameWins };
+        if (gameLosses > worstGame.losses) worstGame = { name: g.name, losses: gameLosses };
+      });
+
+      const avgPity = pities.length ? (pities.reduce((a, b) => a + b, 0) / pities.length).toFixed(1) : 0;
+      const winRate = (wins + losses) > 0 ? ((wins / (wins + losses)) * 100).toFixed(1) : "0.0";
+      if (wins === 0) bestGame.name = "N/A";
+      if (losses === 0) worstGame.name = "N/A";
+
+      return { total5, avgPity, maxPity, wins, losses, guaranteed, winRate, bestGame, worstGame, month: monthNames[now.getMonth()], year: y };
+    }
+
+    function renderMonthlySummary() {
+      const stats = getMonthlyStats();
+      const wrap = document.getElementById("monthly-summary-content");
+      if (stats.total5 === 0) {
+        wrap.innerHTML = `<div class="hist-empty">Nenhum 5★ registrado neste mês (${stats.month}).</div>`;
+        return;
+      }
+      wrap.innerHTML = `
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="sc"><span class="sc-num" style="color:var(--accent2)">${stats.total5}</span><span class="sc-lbl">Total 5★ (Mês)</span></div>
+          <div class="sc"><span class="sc-num">${stats.avgPity}</span><span class="sc-lbl">Pity Médio</span></div>
+          <div class="sc"><span class="sc-num c-r">${stats.maxPity}</span><span class="sc-lbl">Maior Pity</span></div>
+          <div class="sc"><span class="sc-num c-g" style="font-size: 1.1rem;">${stats.bestGame.name}</span><span class="sc-lbl">Sortudo (${stats.bestGame.wins}W)</span></div>
+          <div class="sc" style="grid-column: span 2;"><span class="sc-num c-r" style="font-size: 1.1rem;">${stats.worstGame.name}</span><span class="sc-lbl">Azarado (${stats.worstGame.losses}L)</span></div>
+          <div class="sc" style="grid-column: 1 / -1"><span class="sc-num c-g">${stats.winRate}%</span><span class="sc-lbl">Taxa de Vitória no 50/50</span><span class="sc-sub" style="font-size:0.6rem; color:var(--muted);">${stats.wins}W | ${stats.losses}L | ${stats.guaranteed}G</span></div>
+        </div>`;
+    }
+
+    function downloadMonthlyTxt() {
+      const stats = getMonthlyStats();
+      if (stats.total5 === 0) return alert("Não há dados este mês.");
+      const content = `
+GACHA TRACKER - RELATÓRIO MENSAL
+Período: ${stats.month} / ${stats.year}
+-------------------------------------------
+Total de 5 Estrelas: ${stats.total5}
+Pity Médio: ${stats.avgPity}
+Maior Pity Registrado: ${stats.maxPity}
+-------------------------------------------
+RANKING DO MÊS:
+Melhor Sorte: ${stats.bestGame.name} (${stats.bestGame.wins} vitórias)
+Maior Azar: ${stats.worstGame.name} (${stats.worstGame.losses} derrotas)
+-------------------------------------------
+RESULTADOS GERAIS 50/50:
+Taxa de Vitória: ${stats.winRate}%
+Vitórias: ${stats.wins}
+Derrotas: ${stats.losses}
+Garantidos: ${stats.guaranteed}
+-------------------------------------------
+Gerado em: ${new Date().toLocaleString()}`.trim();
+      const blob = new Blob([content], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Resumo_Gacha_${stats.month}_${stats.year}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ==========================================
+    // CLOUD SYNC REAL (RENDER.COM)
+    // ==========================================
+    const CloudSync = {
+      generateNewId: () => {
+        document.getElementById('sync-id-input').value = 'SYNC-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      },
+      lockUI: (isLocked) => {
+        ['cloud-gs', 'cloud-hsr', 'cloud-zzz', 'sync-id-input', 'cloud-ltuid', 'cloud-ltoken'].forEach(id => {
+          if (document.getElementById(id)) document.getElementById(id).disabled = isLocked;
+        });
+        document.getElementById('btn-cloud-main').style.display = isLocked ? 'none' : 'block';
+        document.getElementById('btn-cloud-edit').style.display = isLocked ? 'block' : 'none';
+      },
+      fetchFromRender: async function (label) {
+        try {
+          const url = `${RENDER_URL}/data/${encodeURIComponent(label.trim())}`;
+          const response = await fetch(url);
+          const data = await response.json();
+          if (data.error) return null;
+          return data;
+        } catch (e) {
+          console.error("Erro na conexão com o Render:", e);
+          return null;
+        }
+      }
+    };
+
+    async function autoSaveToCloud(customLabel = null) {
+      const label = customLabel || localStorage.getItem('gt_sync_label');
+      if (!label) return;
+
+      const siteDataObj = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('gt_') && key !== 'gt_sync_label') {
+          siteDataObj[key] = localStorage.getItem(key);
+        }
+      }
+
+      const payload = {
+        ltuid_v2: document.getElementById('cloud-ltuid') ? document.getElementById('cloud-ltuid').value : "",
+        ltoken_v2: document.getElementById('cloud-ltoken') ? document.getElementById('cloud-ltoken').value : "",
+        uid_gs: document.getElementById('cloud-gs') ? document.getElementById('cloud-gs').value : "",
+        uid_hsr: document.getElementById('cloud-hsr') ? document.getElementById('cloud-hsr').value : "",
+        uid_zzz: document.getElementById('cloud-zzz') ? document.getElementById('cloud-zzz').value : "",
+        siteData: JSON.stringify(siteDataObj)
+      };
+
+      try {
+        await fetch(`${RENDER_URL}/save/${encodeURIComponent(label)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.error("Erro no auto-save", e);
+      }
+    }
+
+    async function performCloudSync() {
+      const label = document.getElementById('sync-id-input').value.trim();
+      if (!label) return alert("Digite o ID de sincronização.");
+
+      const statusEl = document.getElementById('cloud-status-msg');
+      statusEl.textContent = "📡 Sincronizando com o servidor...";
+      statusEl.style.color = "var(--gold)";
+
+      try {
+        // 1. Tenta buscar dados existentes
+        const account = await CloudSync.fetchFromRender(label);
+
+        if (account && account.siteData) {
+          // Restaurar da Nuvem -> PC
+          try {
+            const cloudData = JSON.parse(account.siteData);
+            Object.entries(cloudData).forEach(([k, v]) => localStorage.setItem(k, v));
+
+            if (document.getElementById('cloud-ltuid')) document.getElementById('cloud-ltuid').value = account.ltuid_v2 || "";
+            if (document.getElementById('cloud-ltoken')) document.getElementById('cloud-ltoken').value = account.ltoken_v2 || "";
+            if (document.getElementById('cloud-gs')) document.getElementById('cloud-gs').value = account.uid_gs || "";
+            if (document.getElementById('cloud-hsr')) document.getElementById('cloud-hsr').value = account.uid_hsr || "";
+            if (document.getElementById('cloud-zzz')) document.getElementById('cloud-zzz').value = account.uid_zzz || "";
+          } catch (e) { console.error("Erro no parse do siteData", e); }
+        }
+
+        // 2. Enviar dados atuais (PC -> Nuvem) garante criar se for novo ID
+        await autoSaveToCloud(label);
+
+        // 3. Sucesso
+        localStorage.setItem('gt_sync_label', label);
+        statusEl.textContent = "✅ Sincronizado e Protegido na Nuvem!";
+        statusEl.style.color = "var(--green)";
+        CloudSync.lockUI(true);
+
+        GAMES.forEach(g => {
+          refreshPity(g.id);
+          renderHistory(g.id);
+          renderTimeline(g.id);
+        });
+        if (activeGame) {
+          prefillForm(activeGame);
+          updateLiveStatusUI();
+        }
+
+      } catch (err) {
+        statusEl.textContent = "⚠️ Erro de conexão com o servidor.";
+        statusEl.style.color = "var(--red)";
+      }
+    }
+
+    function unlockCloudFields() {
+      CloudSync.lockUI(false);
+      document.getElementById('cloud-status-msg').textContent = "Modo de edição liberado. Não esqueça de Salvar.";
+      document.getElementById('cloud-status-msg').style.color = "var(--muted2)";
+    }
+
+    async function updateLiveStatusUI() {
+      const syncLabel = localStorage.getItem('gt_sync_label');
+      if (!syncLabel || !activeGame || activeGame === 'endfield') return;
+
+      const resinaEl = document.getElementById(`live-resina-${activeGame}`);
+      const diariaEl = document.getElementById(`live-diaria-${activeGame}`);
+      const timeEl = document.getElementById(`live-update-time-${activeGame}`);
+
+      try {
+        const accountData = await CloudSync.fetchFromRender(syncLabel);
+
+        if (accountData && accountData.results) {
+          const live = typeof accountData.results === 'string' ? JSON.parse(accountData.results) : accountData.results;
+          const keyMap = { "genshin": "gs", "hsr": "hsr", "zzz": "zzz" };
+          const gameKey = keyMap[activeGame];
+          const gameInfo = live[gameKey];
+
+          if (gameInfo && gameInfo !== "N/A") {
+            if (resinaEl) resinaEl.textContent = gameInfo.resin || gameInfo.stamina || gameInfo.energy || "--";
+            if (diariaEl) {
+              diariaEl.textContent = gameInfo.daily || "--";
+              const isDone = diariaEl.textContent.includes("4/4") || diariaEl.textContent.includes("500/500") || diariaEl.textContent.includes("400/400");
+              diariaEl.style.color = isDone ? "var(--green)" : "var(--gold)";
+            }
+            if (timeEl) {
+              const now = new Date();
+              timeEl.textContent = `Visto às ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            }
+            return;
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao carregar Live Status:", e);
+      }
+
+      if (resinaEl) resinaEl.textContent = "--";
+      if (diariaEl) { diariaEl.textContent = "--"; diariaEl.style.color = "var(--muted2)"; }
+      if (timeEl) timeEl.textContent = "Aguardando sincronização da conta...";
+    }
+
+    async function triggerManualSync() {
+      if (!activeGame || activeGame === 'endfield') return;
+      const btn = document.getElementById(`btn-sync-live-${activeGame}`);
+      if (!btn || btn.disabled) return;
+
+      try {
+        btn.disabled = true;
+        btn.textContent = "Solicitando...";
+        await fetch(`${RENDER_URL}/run`);
+
+        let seconds = 30;
+        const timer = setInterval(() => {
+          seconds--;
+          btn.textContent = `Aguarde (${seconds}s)`;
+          if (seconds <= 0) {
+            clearInterval(timer);
+            btn.disabled = false;
+            btn.textContent = "Sincronizar Nuvem";
+            updateLiveStatusUI();
+          }
+        }, 1000);
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = "Erro de conexão";
+      }
+    }
+
+    function startAutoRefreshLoop() {
+      if (liveRefreshTimer) clearInterval(liveRefreshTimer);
+      const AUTO_REFRESH_TIME = (10 * 60 + 30) * 1000;
+      liveRefreshTimer = setInterval(() => {
+        updateLiveStatusUI();
+      }, AUTO_REFRESH_TIME);
+    }
+
+    // ==========================================
+    // LOCAL IMPORT / EXPORT (BACKUP .JSON)
+    // ==========================================
+    function exportData() {
+      const obj = {};
+      Object.keys(localStorage).filter(k => k.startsWith("gt_")).forEach(k => {
+        try { obj[k.slice(3)] = JSON.parse(localStorage.getItem(k)); } catch { }
+      });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" }));
+      a.download = "gacha-tracker-backup.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function importData(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = e => {
+        try {
+          const obj = JSON.parse(e.target.result);
+          Object.entries(obj).forEach(([k, v]) => { try { localStorage.setItem("gt_" + k, JSON.stringify(v)); } catch { } });
+          alert("✓ Importado com sucesso! Recarregando...");
+          location.reload();
+        } catch { alert("Erro ao ler o arquivo JSON."); }
+      };
+      r.readAsText(file);
+      input.value = "";
+    }
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      buildPanels();
+
+      Object.keys(IMG).forEach(k => {
+        const el = document.getElementById("cimg-" + k);
+        if (el) el.src = IMG[k];
+
+        const bbg = document.getElementById("bbg-" + k);
+        if (bbg) bbg.style.backgroundImage = `url('${IMG[k]}')`;
+      });
+
+      await fetchCharCSV();
+      await fetchAutoCountdowns(); // <--- CHAMA OS COUNTDOWNS
+      await fetchCodes();          // <--- CHAMA OS CÓDIGOS ATIVOS
+      await loadFutureBanners();
+
+      GAMES.forEach(g => {
+        const ts = S.get(g.id + "_ts", null);
+        if (ts) startCountdown(g.id, parseInt(ts)); // O manual vai ser renderizado se tiver. O AutoCountdowns fará override na frente se encontrar banner.
+        refreshPity(g.id);
+        renderHistory(g.id);
+        renderTimeline(g.id);
+      });
+
+      const salvo = localStorage.getItem('gt_sync_label');
+      if (salvo) {
+        const input = document.getElementById('sync-id-input');
+        if (input) input.value = salvo;
+        CloudSync.lockUI(true);
+
+        const statusEl = document.getElementById('cloud-status-msg');
+        if (statusEl) {
+          statusEl.textContent = "⏳ Acordando servidor (pode levar 30s)...";
+          statusEl.style.color = "var(--gold)";
+        }
+
+        await updateLiveStatusUI();
+
+        if (statusEl) {
+          statusEl.textContent = "✅ Nuvem conectada.";
+          statusEl.style.color = "var(--green)";
+        }
+
+        CloudSync.fetchFromRender(salvo).then(account => {
+          if (account) {
+            if (document.getElementById('cloud-ltuid')) document.getElementById('cloud-ltuid').value = account.ltuid_v2 || "";
+            if (document.getElementById('cloud-ltoken')) document.getElementById('cloud-ltoken').value = account.ltoken_v2 || "";
+            if (document.getElementById('cloud-gs')) document.getElementById('cloud-gs').value = account.uid_gs || "";
+            if (document.getElementById('cloud-hsr')) document.getElementById('cloud-hsr').value = account.uid_hsr || "";
+            if (document.getElementById('cloud-zzz')) document.getElementById('cloud-zzz').value = account.uid_zzz || "";
+          }
+        });
+      }
+
+      startAutoRefreshLoop();
     });
+
   </script>
 </body>
+
 </html>
