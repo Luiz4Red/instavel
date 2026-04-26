@@ -1829,7 +1829,7 @@
     }
 
     // Fica de olho no Login (Usando supabaseClient)
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const isNewLogin = (!currentUser);
         currentUser = session.user;
@@ -1839,21 +1839,52 @@
       }
       // Fica de olho no Login (Só funciona se o client estiver ok)
       if (supabaseClient) {
+        // Isso aqui vai avisar no seu F12 (Console) tudo o que o Supabase está tentando fazer
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
-          if (session?.user) {
-            const isNewLogin = (!currentUser);
-            currentUser = session.user;
-
-            updateAuthUI(currentUser); // <--- ATUALIZA A TELA
-
-            if (isNewLogin) await syncFromSupabase();
-          } else {
-            currentUser = null;
-            updateAuthUI(null); // <--- ATUALIZA A TELA
-          }
+            console.log("🔄 Evento de Login disparado:", event);
+            
+            if (session?.user) {
+                console.log("✅ Usuário reconhecido:", session.user.email);
+                const isNewLogin = (!currentUser);
+                currentUser = session.user;
+                
+                updateAuthUI(currentUser);
+                
+                if (isNewLogin) await syncFromSupabase();
+            } else {
+                console.log("❌ Nenhum usuário logado encontrado.");
+                currentUser = null;
+                updateAuthUI(null);
+            }
         });
-      }
-    });
+    }
+
+    // Funções HTML de Auth
+    async function loginSupabaseGoogle() {
+        if(supabaseClient) {
+            await supabaseClient.auth.signInWithOAuth({ 
+                provider: 'google', 
+                // O redirectTo garante que o Google devolva o usuário exatamente para a URL atual da aba
+                options: { redirectTo: window.location.origin + window.location.pathname } 
+            });
+        }
+    }
+    
+    async function loginSupabaseDiscord() {
+        if(supabaseClient) {
+            await supabaseClient.auth.signInWithOAuth({ 
+                provider: 'discord', 
+                options: { redirectTo: window.location.origin + window.location.pathname } 
+            });
+        }
+    }
+    
+    async function logoutSupabase() {
+        if(supabaseClient) {
+            await supabaseClient.auth.signOut();
+            alert("Sessão na nuvem encerrada. Seus dados agora são apenas locais.");
+        }
+    }});
 
     async function loginSupabaseGoogle() {
       await supabaseClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
