@@ -1641,11 +1641,12 @@
   <div class="page" id="page-cloud">
     <div class="bpage">
       <div class="bp-title">Sincronização na Nuvem</div>
-      <div class="bp-sub">Conecte-se para salvar seus dados automaticamente e acessar em qualquer dispositivo.</div>
+      <div class="bp-sub">Conecte-se para salvar seus dados e configure sua conta Hoyoverse para Resina em Tempo Real.
+      </div>
 
-      <div class="pblock" style="max-width: 500px; margin: 40px auto; text-align: center;">
+      <div class="pblock" style="max-width: 600px; margin: 40px auto; text-align: center;">
 
-        <!-- MODO DESLOGADO (Aparece quando não tem conta) -->
+        <!-- MODO DESLOGADO -->
         <div id="auth-logged-out">
           <div class="welcome-icon" style="margin: 0 auto 15px;">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--muted2)" stroke-width="2">
@@ -1656,21 +1657,12 @@
           </div>
 
           <button class="btn-post" onclick="loginSupabaseGoogle()"
-            style="width: 100%; margin-bottom: 12px; background: #DB4437; color: white;">
-            Login com Google
-          </button>
-
+            style="width: 100%; margin-bottom: 12px; background: #DB4437; color: white;">Login com Google</button>
           <button class="btn-post" onclick="loginSupabaseDiscord()"
-            style="width: 100%; background: #5865F2; color: white;">
-            Login com Discord
-          </button>
-
-          <div style="margin-top: 15px; font-size: 0.7rem; color: var(--muted2);">
-            Seus dados locais (Pity, Histórico) serão mesclados com a nuvem automaticamente após o login.
-          </div>
+            style="width: 100%; background: #5865F2; color: white;">Login com Discord</button>
         </div>
 
-        <!-- MODO LOGADO (Aparece quando está logado) -->
+        <!-- MODO LOGADO -->
         <div id="auth-logged-in" style="display: none;">
           <div class="welcome-icon" style="margin: 0 auto 15px; border-color: var(--green);">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2">
@@ -1679,21 +1671,47 @@
             </svg>
           </div>
           <h3 style="font-family: Rajdhani; font-size: 1.2rem; color: var(--text); margin-bottom: 5px;"
-            id="auth-user-email">
-            Carregando...
-          </h3>
-          <p style="font-size: 0.75rem; color: var(--green); margin-bottom: 25px;">
-            ✦ Backup automático ativado
-          </p>
+            id="auth-user-email">Carregando...</h3>
+          <p style="font-size: 0.75rem; color: var(--green); margin-bottom: 25px;">✦ Backup automático ativado</p>
 
-          <button class="btn-edit" onclick="triggerSupabaseSync()" style="width: 100%; margin-bottom: 12px;">
-            Forçar Sincronização Agora
-          </button>
+          <div style="display:flex; gap:10px; margin-bottom: 12px;">
+            <button class="btn-edit" onclick="triggerSupabaseSync()" style="flex:1;">Forçar Backup</button>
+            <button class="btn-edit" onclick="logoutSupabase()"
+              style="flex:1; border-color: rgba(255, 80, 112, 0.4); color: var(--red);">Desconectar</button>
+          </div>
+        </div>
 
-          <button class="btn-edit" onclick="logoutSupabase()"
-            style="width: 100%; border-color: rgba(255, 80, 112, 0.4); color: var(--red);">
-            Desconectar Conta
-          </button>
+        <!-- FORMULÁRIO DE DADOS (HOYOVERSE E UIDS) -->
+        <div id="hoyo-form-container"
+          style="margin-top: 35px; border-top: 1px solid var(--border); padding-top: 25px; text-align: left;">
+          <div class="pblock-title" style="margin-bottom: 15px;">Dados de Acesso (Hoyoverse) - Resina Live</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="pe-grp">
+              <label class="pe-lbl">ltuid_v2</label>
+              <input type="password" id="cloud-ltuid" class="pe-inp" placeholder="Oculto">
+            </div>
+            <div class="pe-grp">
+              <label class="pe-lbl">ltoken_v2</label>
+              <input type="password" id="cloud-ltoken" class="pe-inp" placeholder="Oculto">
+            </div>
+          </div>
+
+          <div class="pblock-title" style="margin-top: 20px; margin-bottom: 15px;">Identificadores de Jogo (UID)</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+            <div class="pe-grp"><label class="pe-lbl">Genshin</label><input type="text" id="cloud-gs" class="pe-inp"
+                placeholder="Opcional"></div>
+            <div class="pe-grp"><label class="pe-lbl">Star Rail</label><input type="text" id="cloud-hsr" class="pe-inp"
+                placeholder="Opcional"></div>
+            <div class="pe-grp"><label class="pe-lbl">Zenless</label><input type="text" id="cloud-zzz" class="pe-inp"
+                placeholder="Opcional"></div>
+          </div>
+
+          <button id="btn-hoyo-save" class="btn-post" onclick="saveHoyoConfigs()"
+            style="margin-top: 25px; width: 100%;">✓ Salvar Dados de Acesso</button>
+          <button id="btn-hoyo-edit" class="btn-edit" onclick="unlockHoyoConfigs()"
+            style="margin-top: 10px; width: 100%; display: none;">✎ Editar Dados de Acesso</button>
+          <div id="hoyo-status-msg" style="margin-top: 15px; font-size: 0.75rem; font-weight:bold; text-align: center;">
+          </div>
         </div>
 
       </div>
@@ -1812,6 +1830,7 @@
 
       if (data && data.site_data) {
         Object.entries(data.site_data).forEach(([k, v]) => {
+          loadHoyoConfigs(); 
           localStorage.setItem(k, v);
         });
         console.log("📱 Dados locais atualizados com a nuvem!");
@@ -1829,7 +1848,7 @@
     }
 
     // Fica de olho no Login (Usando supabaseClient)
-     supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const isNewLogin = (!currentUser);
         currentUser = session.user;
@@ -1841,50 +1860,51 @@
       if (supabaseClient) {
         // Isso aqui vai avisar no seu F12 (Console) tudo o que o Supabase está tentando fazer
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            console.log("🔄 Evento de Login disparado:", event);
-            
-            if (session?.user) {
-                console.log("✅ Usuário reconhecido:", session.user.email);
-                const isNewLogin = (!currentUser);
-                currentUser = session.user;
-                
-                updateAuthUI(currentUser);
-                
-                if (isNewLogin) await syncFromSupabase();
-            } else {
-                console.log("❌ Nenhum usuário logado encontrado.");
-                currentUser = null;
-                updateAuthUI(null);
-            }
-        });
-    }
+          console.log("🔄 Evento de Login disparado:", event);
 
-    // Funções HTML de Auth
-    async function loginSupabaseGoogle() {
-        if(supabaseClient) {
-            await supabaseClient.auth.signInWithOAuth({ 
-                provider: 'google', 
-                // O redirectTo garante que o Google devolva o usuário exatamente para a URL atual da aba
-                options: { redirectTo: window.location.origin + window.location.pathname } 
-            });
+          if (session?.user) {
+            console.log("✅ Usuário reconhecido:", session.user.email);
+            const isNewLogin = (!currentUser);
+            currentUser = session.user;
+
+            updateAuthUI(currentUser);
+
+            if (isNewLogin) await syncFromSupabase();
+          } else {
+            console.log("❌ Nenhum usuário logado encontrado.");
+            currentUser = null;
+            updateAuthUI(null);
+          }
+        });
+      }
+
+      // Funções HTML de Auth
+      async function loginSupabaseGoogle() {
+        if (supabaseClient) {
+          await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            // O redirectTo garante que o Google devolva o usuário exatamente para a URL atual da aba
+            options: { redirectTo: window.location.origin + window.location.pathname }
+          });
         }
-    }
-    
-    async function loginSupabaseDiscord() {
-        if(supabaseClient) {
-            await supabaseClient.auth.signInWithOAuth({ 
-                provider: 'discord', 
-                options: { redirectTo: window.location.origin + window.location.pathname } 
-            });
+      }
+
+      async function loginSupabaseDiscord() {
+        if (supabaseClient) {
+          await supabaseClient.auth.signInWithOAuth({
+            provider: 'discord',
+            options: { redirectTo: window.location.origin + window.location.pathname }
+          });
         }
-    }
-    
-    async function logoutSupabase() {
-        if(supabaseClient) {
-            await supabaseClient.auth.signOut();
-            alert("Sessão na nuvem encerrada. Seus dados agora são apenas locais.");
+      }
+
+      async function logoutSupabase() {
+        if (supabaseClient) {
+          await supabaseClient.auth.signOut();
+          alert("Sessão na nuvem encerrada. Seus dados agora são apenas locais.");
         }
-    }});
+      }
+    });
 
     async function loginSupabaseGoogle() {
       await supabaseClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
@@ -2786,7 +2806,7 @@
 
         html += `
             <div class="future-char">
-                <img src="${charImage}" class="future-char-icon" alt="${c.name}" onerror="this.src='https://via.placeholder.com/50'">
+                <img src="${charImage}" class="future-char-icon" alt="${c.name}" onerror="this.onerror=null; this.style.display='none'">
                 <div class="future-char-info">
                     <div class="future-char-header">
                         <span class="future-char-name">${c.name}</span>
@@ -3115,28 +3135,80 @@ Gerado em: ${new Date().toLocaleString()}`.trim();
       input.value = "";
     }
 
-    // ==========================================
+    function loadHoyoConfigs() {
+      const fields = ['cloud-ltuid', 'cloud-ltoken', 'cloud-gs', 'cloud-hsr', 'cloud-zzz'];
+      let hasData = false;
+
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        // Puxa do LocalStorage (ex: gt_cloud_ltuid)
+        const val = S.get(id.replace('-', '_'), '');
+        if (el && val) {
+          el.value = val;
+          hasData = true;
+        }
+      });
+
+      if (hasData) {
+        lockHoyoConfigs();
+      }
+    }
+    // CONTROLE DOS CAMPOS HOYOVERSE / UIDs
+    function lockHoyoConfigs() {
+      ['cloud-ltuid', 'cloud-ltoken', 'cloud-gs', 'cloud-hsr', 'cloud-zzz'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = true;
+      });
+      document.getElementById('btn-hoyo-save').style.display = 'none';
+      document.getElementById('btn-hoyo-edit').style.display = 'block';
+    }
+
+    function unlockHoyoConfigs() {
+      ['cloud-ltuid', 'cloud-ltoken', 'cloud-gs', 'cloud-hsr', 'cloud-zzz'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = false;
+      });
+      document.getElementById('btn-hoyo-save').style.display = 'block';
+      document.getElementById('btn-hoyo-edit').style.display = 'none';
+      document.getElementById('hoyo-status-msg').textContent = "Modo de edição liberado.";
+      document.getElementById('hoyo-status-msg').style.color = "var(--muted2)";
+    }
+
+    function saveHoyoConfigs() {
+      ['cloud-ltuid', 'cloud-ltoken', 'cloud-gs', 'cloud-hsr', 'cloud-zzz'].forEach(id => {
+        const el = document.getElementById(id);
+        // Salvar no S.set faz o Supabase capturar e salvar na nuvem automaticamente!
+        if (el) S.set(id.replace('-', '_'), el.value.trim());
+      });
+
+      lockHoyoConfigs();
+
+      const msg = document.getElementById('hoyo-status-msg');
+      msg.textContent = "✅ Dados salvos com sucesso!";
+      msg.style.color = "var(--green)";
+      setTimeout(() => msg.textContent = "", 3000);
+    }
     // INITIALIZATION
-    // ==========================================
     document.addEventListener('DOMContentLoaded', async () => {
       buildPanels();
-
+      loadHoyoConfigs();
       Object.keys(IMG).forEach(k => {
         const el = document.getElementById("cimg-" + k);
         if (el) el.src = IMG[k];
 
         const bbg = document.getElementById("bbg-" + k);
         if (bbg) bbg.style.backgroundImage = `url('${IMG[k]}')`;
+        
       });
 
       await fetchCharCSV();
-      await fetchAutoCountdowns(); // <--- CHAMA OS COUNTDOWNS
-      await fetchCodes();          // <--- CHAMA OS CÓDIGOS ATIVOS
+      await fetchAutoCountdowns();
+      await fetchCodes();
       await loadFutureBanners();
 
       GAMES.forEach(g => {
         const ts = S.get(g.id + "_ts", null);
-        if (ts) startCountdown(g.id, parseInt(ts)); // O manual vai ser renderizado se tiver. O AutoCountdowns fará override na frente se encontrar banner.
+        if (ts) startCountdown(g.id, parseInt(ts));
         refreshPity(g.id);
         renderHistory(g.id);
         renderTimeline(g.id);
