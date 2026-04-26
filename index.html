@@ -1857,45 +1857,22 @@
       }
       // Fica de olho no Login (Só funciona se o client estiver ok)
       if (supabaseClient) {
-        
-        // Função interna para processar a sessão encontrada
-        async function handleSession(session) {
-            if (session?.user) {
-                console.log("✅ Sessão recuperada:", session.user.email);
-                currentUser = session.user;
-                updateAuthUI(currentUser);
-                
-                // Sincroniza os dados da nuvem para o local
-                await syncFromSupabase();
-            } else {
-                console.log("❌ Nenhuma sessão ativa.");
-                currentUser = null;
-                updateAuthUI(null);
-            }
-        }
-
-        // 1. VERIFICAÇÃO IMEDIATA (Executa assim que o script carrega)
-        // Não esperamos o evento, nós PERGUNTAMOS ao Supabase agora
-        supabaseClient.auth.getSession().then(({ data }) => {
-            handleSession(data.session);
-        }).catch(err => {
-            console.error("Erro ao recuperar sessão:", err);
-            updateAuthUI(null);
-        });
-
-        // 2. ESCUTA DE EVENTOS (Para quando o usuário clica em Logar ou Sair)
+        // Isso aqui vai avisar no seu F12 (Console) tudo o que o Supabase está tentando fazer
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            console.log("🔄 Mudança de estado detectada:", event);
-            
-            if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-                await handleSession(session);
-            } else if (event === 'SIGNED_OUT') {
-                currentUser = null;
-                updateAuthUI(null);
-            }
-        });
-    }
 
+          if (session?.user) {
+            const isNewLogin = (!currentUser);
+            currentUser = session.user;
+
+            updateAuthUI(currentUser);
+
+            if (isNewLogin) await syncFromSupabase();
+          } else {
+            currentUser = null;
+            updateAuthUI(null);
+          }
+        });
+      }
 
       // Funções HTML de Auth
       async function loginSupabaseGoogle() {
