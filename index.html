@@ -1637,59 +1637,70 @@
     </div>
   </div>
 
-  <!-- PÁGINA: NUVEM (CLOUD FORM) -->
+  <!-- PÁGINA: NUVEM E LOGIN -->
   <div class="page" id="page-cloud">
     <div class="bpage">
-      <div class="bp-title">Sincronização Multi-Dispositivo</div>
-      <div class="bp-sub">Use uma chave única para conectar este dispositivo à sua conta na nuvem.</div>
+      <div class="bp-title">Sincronização na Nuvem</div>
+      <div class="bp-sub">Conecte-se para salvar seus dados automaticamente e acessar em qualquer dispositivo.</div>
 
-      <div class="pblock" style="max-width: 600px; margin: 0 auto;">
-        <div class="pblock-title">Chave de Sincronização</div>
-        <div class="pe-grp" style="margin-bottom: 20px;">
-          <label class="pe-lbl">Sua Chave Única (ID)</label>
-          <div style="display: flex; gap: 10px;">
-            <input type="text" id="sync-id-input" class="pe-inp" placeholder="Crie ou insira seu ID de sincronização">
-            <button class="btn-edit" onclick="CloudSync.generateNewId()"
-              style="flex:unset; white-space: nowrap; padding: 8px 15px;">Gerar Nova</button>
+      <div class="pblock" style="max-width: 500px; margin: 40px auto; text-align: center;">
+
+        <!-- MODO DESLOGADO (Aparece quando não tem conta) -->
+        <div id="auth-logged-out">
+          <div class="welcome-icon" style="margin: 0 auto 15px;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--muted2)" stroke-width="2">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+            </svg>
           </div>
-          <small style="color: var(--muted2); font-size:0.65rem; margin-top:4px;">Insira este mesmo ID em outro PC para
-            ver os mesmos dados.</small>
-        </div>
-
-        <div id="cloud-form-container">
-          <div class="pblock-title" style="margin-top: 20px;">Dados de Acesso (Hoyoverse)</div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="pe-grp">
-              <label class="pe-lbl">ltuid_v2</label>
-              <input type="password" id="cloud-ltuid" class="pe-inp" placeholder="Oculto">
-            </div>
-            <div class="pe-grp">
-              <label class="pe-lbl">ltoken_v2</label>
-              <input type="password" id="cloud-ltoken" class="pe-inp" placeholder="Oculto">
-            </div>
+          <div class="pblock-title" style="justify-content: center; margin-bottom: 20px;">Faça login para continuar
           </div>
 
-          <div class="pblock-title" style="margin-top: 20px;">Identificadores de Jogo (UID)</div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
-            <div class="pe-grp"><label class="pe-lbl">Genshin</label><input type="text" id="cloud-gs" class="pe-inp"
-                placeholder="Opcional"></div>
-            <div class="pe-grp"><label class="pe-lbl">Star Rail</label><input type="text" id="cloud-hsr" class="pe-inp"
-                placeholder="Opcional"></div>
-            <div class="pe-grp"><label class="pe-lbl">Zenless</label><input type="text" id="cloud-zzz" class="pe-inp"
-                placeholder="Opcional"></div>
-          </div>
+          <button class="btn-post" onclick="loginSupabaseGoogle()"
+            style="width: 100%; margin-bottom: 12px; background: #DB4437; color: white;">
+            Login com Google
+          </button>
 
-          <button id="btn-cloud-main" class="btn-post" onclick="performCloudSync()"
-            style="margin-top: 25px; width: 100%;">✓ Sincronizar e Proteger Dados</button>
-          <button id="btn-cloud-edit" class="btn-edit" onclick="unlockCloudFields()"
-            style="margin-top: 10px; width: 100%; display: none;">✎ Editar Dados</button>
+          <button class="btn-post" onclick="loginSupabaseDiscord()"
+            style="width: 100%; background: #5865F2; color: white;">
+            Login com Discord
+          </button>
+
+          <div style="margin-top: 15px; font-size: 0.7rem; color: var(--muted2);">
+            Seus dados locais (Pity, Histórico) serão mesclados com a nuvem automaticamente após o login.
+          </div>
         </div>
-        <div id="cloud-status-msg" style="margin-top: 15px; font-size: 0.75rem; font-weight:bold; text-align: center;">
+
+        <!-- MODO LOGADO (Aparece quando está logado) -->
+        <div id="auth-logged-in" style="display: none;">
+          <div class="welcome-icon" style="margin: 0 auto 15px; border-color: var(--green);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h3 style="font-family: Rajdhani; font-size: 1.2rem; color: var(--text); margin-bottom: 5px;"
+            id="auth-user-email">
+            Carregando...
+          </h3>
+          <p style="font-size: 0.75rem; color: var(--green); margin-bottom: 25px;">
+            ✦ Backup automático ativado
+          </p>
+
+          <button class="btn-edit" onclick="triggerSupabaseSync()" style="width: 100%; margin-bottom: 12px;">
+            Forçar Sincronização Agora
+          </button>
+
+          <button class="btn-edit" onclick="logoutSupabase()"
+            style="width: 100%; border-color: rgba(255, 80, 112, 0.4); color: var(--red);">
+            Desconectar Conta
+          </button>
         </div>
+
       </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SCRIPTS -->
   <script>
     // Configurações Globais
@@ -1715,34 +1726,149 @@
       "Genshin Impact": "#c9a227", "Honkai: Star Rail": "#9b59f5",
       "Zenless Zone Zero": "#00f5f5", "Arknights: Endfield": "#30e08a"
     };
-
     const RENEW = 21;
     const MAX_HIST = 15;
     const RENDER_URL = 'https://gacha-tracker-priv.onrender.com';
     let liveRefreshTimer = null;
 
-    // ── STORAGE & STATE ──
+    // ── CONFIGURAÇÃO SUPABASE ──
+    const SUPABASE_URL = 'https://geiwnjzdbrwkpsuhvoqa.supabase.co'; // <-- Coloque sua URL aqui
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdlaXduanpkYnJ3a3BzdWh2b3FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg0MTQsImV4cCI6MjA5Mjc0NDQxNH0.hUd__fy87VE629nhm8fZTgh9ZQSPbrnjM9XiQhvJ-bI'; // <-- Coloque sua Anon Key aqui
+
+    // MUDANÇA AQUI: Variável renomeada para 'supabaseClient' para não conflitar com o CDN
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let syncTimeout = null;
+
+    // ── STORAGE & STATE (LOCAL-FIRST) ──
     const S = {
       get(k, d = null) { try { const v = localStorage.getItem("gt_" + k); return v !== null ? JSON.parse(v) : d } catch { return d } },
-      set(k, v) { try { localStorage.setItem("gt_" + k, JSON.stringify(v)) } catch { } }
+      set(k, v) {
+        try {
+          localStorage.setItem("gt_" + k, JSON.stringify(v));
+          triggerSupabaseSync();
+        } catch { }
+      }
     };
+
     const timers = {};
     const fiftyState = {};
     let activeGame = null;
     let bannerLoaded = false;
+    // ==========================================
+    // CONTROLE DA INTERFACE DE LOGIN
+    // ==========================================
+    function updateAuthUI(user) {
+      const loggedOutDiv = document.getElementById('auth-logged-out');
+      const loggedInDiv = document.getElementById('auth-logged-in');
+      const emailSpan = document.getElementById('auth-user-email');
 
-    const esc = s => String(s).replace(/[&<>"\']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-    const pad = n => String(n).padStart(2, "0");
-    const ppCls = p => p < 50 ? "c-g" : p <= 70 ? "c-y" : "c-r";
-    const curCls = p => p < 50 ? "c-g" : p <= 70 ? "c-y" : "c-r";
-    const ftCls = v => v === "W" ? "c-g" : v === "G" ? "c-y" : "c-r";
-    const ftLbl = v => v === "W" ? "W · Ganhou" : v === "G" ? "G · Garantido" : "L · Perdeu";
-    const ftShort = v => v === "W" ? "W" : v === "G" ? "G" : "L";
+      if (user) {
+        if (loggedOutDiv) loggedOutDiv.style.display = 'none';
+        if (loggedInDiv) loggedInDiv.style.display = 'block';
+        if (emailSpan) emailSpan.textContent = user.email || "Usuário Logado";
+      } else {
+        if (loggedOutDiv) loggedOutDiv.style.display = 'block';
+        if (loggedInDiv) loggedInDiv.style.display = 'none';
+      }
+    }
 
     // ==========================================
-    // 1. FETCH GOOGLE SHEETS (CSV) PARA TIMELINE E FUTUROS
+    // LÓGICA DO SUPABASE 
     // ==========================================
+    function triggerSupabaseSync() {
+      if (!currentUser) return;
+
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(async () => {
+        const siteDataObj = {};
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith('gt_') && key !== 'gt_sync_label') {
+            siteDataObj[key] = localStorage.getItem(key);
+          }
+        }
+
+        // Usando supabaseClient
+        const { error } = await supabaseClient.from('user_data').upsert({
+          user_id: currentUser.id,
+          site_data: siteDataObj
+        });
+
+        if (!error) console.log("☁️ Backup Local-First salvo na nuvem!");
+      }, 2000);
+    }
+
+    async function syncFromSupabase() {
+      if (!currentUser) return;
+
+      // Usando supabaseClient
+      const { data, error } = await supabaseClient
+        .from('user_data')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .single();
+
+      if (data && data.site_data) {
+        Object.entries(data.site_data).forEach(([k, v]) => {
+          localStorage.setItem(k, v);
+        });
+        console.log("📱 Dados locais atualizados com a nuvem!");
+
+        // Re-renderiza tudo após baixar da nuvem
+        GAMES.forEach(g => {
+          refreshPity(g.id);
+          renderHistory(g.id);
+          renderTimeline(g.id);
+        });
+        if (activeGame) prefillForm(activeGame);
+      } else if (!data) {
+        triggerSupabaseSync();
+      }
+    }
+
+    // Fica de olho no Login (Usando supabaseClient)
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const isNewLogin = (!currentUser);
+        currentUser = session.user;
+        if (isNewLogin) await syncFromSupabase();
+      } else {
+        currentUser = null;
+      }
+      // Fica de olho no Login (Só funciona se o client estiver ok)
+      if (supabaseClient) {
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+          if (session?.user) {
+            const isNewLogin = (!currentUser);
+            currentUser = session.user;
+
+            updateAuthUI(currentUser); // <--- ATUALIZA A TELA
+
+            if (isNewLogin) await syncFromSupabase();
+          } else {
+            currentUser = null;
+            updateAuthUI(null); // <--- ATUALIZA A TELA
+          }
+        });
+      }
+    });
+
+    async function loginSupabaseGoogle() {
+      await supabaseClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+    }
+    async function loginSupabaseDiscord() {
+      await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin } });
+    }
+    async function logoutSupabase() {
+      await supabaseClient.auth.signOut();
+      alert("Sessão na nuvem encerrada.");
+    }
+
+    // Código CSV original mantido para os personagens
     async function fetchCharCSV() {
+
       const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm5Kk3LdPMBgYh17C6PQrRX_xI1G6KG8xv2Ubh9GhfKjBzig0oaJUZZ7P5BDy0-Eh1Lm4icCiYQeYr/pub?output=csv";
       const proxies = [u => u, u => "https://corsproxy.io/?" + encodeURIComponent(u), u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u)];
 
@@ -1774,6 +1900,22 @@
         } catch (e) { }
       }
     }
+
+
+
+
+    const esc = s => String(s).replace(/[&<>"\']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const pad = n => String(n).padStart(2, "0");
+    const ppCls = p => p < 50 ? "c-g" : p <= 70 ? "c-y" : "c-r";
+    const curCls = p => p < 50 ? "c-g" : p <= 70 ? "c-y" : "c-r";
+    const ftCls = v => v === "W" ? "c-g" : v === "G" ? "c-y" : "c-r";
+    const ftLbl = v => v === "W" ? "W · Ganhou" : v === "G" ? "G · Garantido" : "L · Perdeu";
+    const ftShort = v => v === "W" ? "W" : v === "G" ? "G" : "L";
+
+    // ==========================================
+    // 1. FETCH GOOGLE SHEETS (CSV) PARA TIMELINE E FUTUROS
+    // ==========================================
+
 
     // ==========================================
     // 2. CONSTRUÇÃO DA INTERFACE DO TRACKER
