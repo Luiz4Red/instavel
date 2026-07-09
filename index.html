@@ -3,233 +3,367 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Live Releases Store</title>
+    <title>GitHub Software Store - Live</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg-color: #0d1117;
             --card-bg: #161b22;
-            --text-color: #c9d1d9;
-            --accent-color: #238636;
-            --border-color: #30363d;
+            --text-main: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent: #238636;
+            --accent-hover: #2ea44f;
+            --border: #30363d;
+            --win-color: #00a4ef;
+            --android-color: #3ddc84;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-main);
             margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Header & Navigation */
+        header {
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 1rem;
+            text-align: center;
+            background: #010409;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            color: var(--text-secondary);
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(35, 134, 54, 0.7);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(35, 134, 54, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(35, 134, 54, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(35, 134, 54, 0); }
+        }
+
+        /* Filtros */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn:hover { border-color: var(--text-secondary); }
+        .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Grid de Apps */
+        #store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .app-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
+            animation: slideUp 0.4s ease-out;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            max-width: 600px;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        h1 {
-            color: #ffffff;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            color: #8b949e;
-            font-size: 0.95rem;
-        }
-
-        .status {
-            font-size: 0.85rem;
-            color: #58a6ff;
-            margin-top: 10px;
-        }
-
-        #feed {
-            width: 100%;
-            max-width: 650px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            animation: fadeIn 0.5s ease-out;
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
+        .app-card:hover {
             border-color: #8b949e;
+            transform: translateY(-4px);
         }
 
-        .repo-name {
-            font-size: 1.1rem;
-            font-weight: bold;
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .repo-path {
             color: #58a6ff;
             text-decoration: none;
-            display: inline-block;
-            margin-bottom: 5px;
-        }
-
-        .repo-name:hover {
-            text-decoration: underline;
-        }
-
-        .tag {
-            display: inline-block;
-            background-color: #21262d;
-            border: 1px solid var(--border-color);
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: #f0f6fc;
             font-weight: 600;
-            margin-left: 8px;
+            font-size: 1rem;
+            word-break: break-all;
         }
 
-        .description {
-            font-size: 0.9rem;
-            color: #8b949e;
-            margin: 8px 0;
-            line-height: 1.4;
+        .platform-badges {
+            display: flex;
+            gap: 5px;
         }
 
-        .footer-card {
+        .badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .badge-win { background: rgba(0, 164, 239, 0.15); color: var(--win-color); border: 1px solid var(--win-color); }
+        .badge-android { background: rgba(61, 220, 132, 0.15); color: var(--android-color); border: 1px solid var(--android-color); }
+
+        .app-title {
+            font-size: 1.1rem;
+            margin: 5px 0;
+            color: #fff;
+        }
+
+        .app-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 10px 0;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .app-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #21262d;
-            font-size: 0.8rem;
-            color: #8b949e;
         }
 
-        .btn-download {
-            background-color: var(--accent-color);
+        .btn-install {
+            background: var(--accent);
             color: white;
             text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 4px;
+            padding: 6px 16px;
+            border-radius: 6px;
             font-weight: 600;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .btn-install:hover { background: var(--accent-hover); }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 0.8rem;
+            color: var(--text-secondary);
         }
 
-        .btn-download:hover {
-            background-color: #2ea44f;
+        .user-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Responsive */
+        @media (max-width: 600px) {
+            #store-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>GitHub Live App Releases</h1>
-        <div class="subtitle">Descobrindo projetos e softwares do mundo inteiro no exato segundo em que são lançados, sem filtros de popularidade.</div>
-        <div id="status" class="status">Conectando ao fluxo do GitHub...</div>
+        <div class="container">
+            <h1><i class="fa-brands fa-github"></i> OpenSource Store</h1>
+            <p style="color: var(--text-secondary);">Descubra softwares novos lançados globalmente em tempo real</p>
+            <div class="status-bar">
+                <div class="pulse"></div>
+                <span id="status-text">Conectando ao GitHub Live Stream...</span>
+            </div>
+        </div>
     </header>
 
-    <main id="feed">
-        <!-- Os cards de apps vão aparecer aqui dinamicamente -->
-    </main>
+    <div class="container">
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterApps('all', this)">
+                <i class="fa-solid fa-border-all"></i> Todos
+            </button>
+            <button class="filter-btn" onclick="filterApps('windows', this)">
+                <i class="fa-brands fa-windows"></i> Windows (.exe)
+            </button>
+            <button class="filter-btn" onclick="filterApps('android', this)">
+                <i class="fa-brands fa-android"></i> Android (.apk)
+            </button>
+        </div>
+
+        <main id="store-grid">
+            <!-- Os cards entrarão aqui -->
+        </main>
+    </div>
 
     <script>
-        const feedContainer = document.getElementById('feed');
-        const statusText = document.getElementById('status');
+        const storeGrid = document.getElementById('store-grid');
+        const statusText = document.getElementById('status-text');
         
-        // Guardar IDs para evitar duplicados na tela caso a API repita eventos
-        const seenReleases = new Set();
+        let allReleases = []; // Memória local dos apps capturados
+        let currentFilter = 'all';
 
-        async function fetchLiveReleases() {
-            statusText.innerText = "Buscando novos lançamentos...";
+        async function fetchNewReleases() {
             try {
-                // Endpoint público global de eventos do GitHub
-                const response = await fetch('https://api.github.com/events', {
-                    headers: { 'Accept': 'application/vnd.github+json' }
-                });
-                
-                if (!response.ok) throw new Error('Limite de requisições atingido ou erro na API');
+                // Buscando eventos globais do GitHub
+                const response = await fetch('https://api.github.com/events');
+                if (!response.ok) throw new Error('Limite atingido (60 req/hora)');
 
                 const events = await response.json();
-                
-                // Filtra APENAS eventos de "ReleaseEvent" (quando criam uma versão publicada)
-                const releaseEvents = events.filter(event => event.type === 'ReleaseEvent');
-
-                if (releaseEvents.length === 0) {
-                    statusText.innerText = "Monitorando fluxo ativo... Aguardando novos deploys mundiais.";
-                    return;
-                }
-
-                statusText.innerText = "Fluxo ao vivo ativo. Atualizando...";
+                const releaseEvents = events.filter(e => e.type === 'ReleaseEvent');
 
                 releaseEvents.forEach(event => {
-                    const releaseId = event.payload.release.id;
+                    const releaseData = event.payload.release;
                     
-                    // Se já exibimos esse release, ignora
-                    if (seenReleases.has(releaseId)) return;
-                    seenReleases.add(releaseId);
+                    // Evita duplicados
+                    if (allReleases.some(r => r.id === releaseData.id)) return;
 
-                    const repoName = event.repo.name;
-                    const tagVersion = event.payload.release.tag_name;
-                    const releaseTitle = event.payload.release.name || tagVersion;
-                    const repoUrl = `https://github.com/${repoName}`;
-                    const downloadUrl = event.payload.release.html_url;
-                    
-                    // Tratamento simples para repositórios sem descrição externa
-                    let description = event.payload.release.body || "Nenhuma nota de lançamento fornecida.";
-                    if (description.length > 200) {
-                        description = description.substring(0, 200) + '...';
-                    }
+                    // Analisar assets para identificar plataforma
+                    const assets = releaseData.assets || [];
+                    const hasExe = assets.some(a => a.name.endsWith('.exe') || a.name.endsWith('.msi'));
+                    const hasApk = assets.some(a => a.name.endsWith('.apk'));
 
-                    // Limpar tags Markdown/HTML básicas que venham no texto do body do release
-                    description = description.replace(/[#*`]/g, '');
+                    const appObject = {
+                        id: releaseData.id,
+                        repoName: event.repo.name,
+                        tagName: releaseData.tag_name,
+                        title: releaseData.name || releaseData.tag_name,
+                        description: releaseData.body || "Sem descrição disponível.",
+                        author: event.actor.login,
+                        authorAvatar: event.actor.avatar_url,
+                        url: releaseData.html_url,
+                        hasExe: hasExe,
+                        hasApk: hasApk,
+                        timestamp: new Date()
+                    };
 
-                    // Cria o HTML do Card
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <a href="${repoUrl}" target="_blank" class="repo-name">${repoName}</a>
-                        <span class="tag">${tagVersion}</span>
-                        <div style="font-weight: 500; margin-top:5px; font-size:0.95rem;">${releaseTitle}</div>
-                        <p class="description">${description}</p>
-                        <div class="footer-card">
-                            <span>Publicado por: @${event.actor.login}</span>
-                            <a href="${downloadUrl}" target="_blank" class="btn-download">Ver Lançamento</a>
-                        </div>
-                    `;
-
-                    // Insere sempre no topo para dar o efeito de feed em tempo real
-                    feedContainer.insertBefore(card, feedContainer.firstChild);
-
-                    // Limita a tela a 40 itens para não travar o navegador
-                    if (feedContainer.children.length > 40) {
-                        feedContainer.removeChild(feedContainer.lastChild);
-                    }
+                    allReleases.unshift(appObject);
                 });
 
-            } catch (error) {
-                console.error(error);
-                statusText.innerText = "Aguardando janela de requisições do GitHub (Rate Limit)...";
+                renderStore();
+                statusText.innerText = `Monitorando... ${allReleases.length} apps encontrados nesta sessão.`;
+
+            } catch (err) {
+                statusText.innerText = "Aguardando API (Rate Limit)...";
+                console.error(err);
             }
         }
 
-        // Executa a primeira busca imediatamente ao carregar
-        fetchLiveReleases();
+        function filterApps(type, btn) {
+            currentFilter = type;
+            
+            // UI Update
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            renderStore();
+        }
 
-        // O GitHub atualiza essa lista de tempos em tempos. 
-        // Rodamos a busca a cada 30 segundos (respeitando as regras de uso da API gratuita)
-        setInterval(fetchLiveReleases, 30000);
+        function renderStore() {
+            storeGrid.innerHTML = '';
+
+            const filtered = allReleases.filter(app => {
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'windows') return app.hasExe;
+                if (currentFilter === 'android') return app.hasApk;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                storeGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-secondary);">
+                    Aguardando novos lançamentos para este filtro...
+                </div>`;
+                return;
+            }
+
+            filtered.forEach(app => {
+                const card = document.createElement('div');
+                card.className = 'app-card';
+                
+                let badges = '';
+                if (app.hasExe) badges += `<span class="badge badge-win"><i class="fa-brands fa-windows"></i> EXE</span>`;
+                if (app.hasApk) badges += `<span class="badge badge-android"><i class="fa-brands fa-android"></i> APK</span>`;
+
+                card.innerHTML = `
+                    <div class="app-header">
+                        <a href="https://github.com/${app.repoName}" target="_blank" class="repo-path">${app.repoName}</a>
+                        <div class="platform-badges">${badges}</div>
+                    </div>
+                    <div class="app-title">${app.title}</div>
+                    <div class="app-desc">${cleanMarkdown(app.description)}</div>
+                    <div class="app-footer">
+                        <div class="user-info">
+                            <img src="${app.authorAvatar}" class="user-avatar">
+                            <span>${app.author}</span>
+                        </div>
+                        <a href="${app.url}" target="_blank" class="btn-install">Obter</a>
+                    </div>
+                `;
+                storeGrid.appendChild(card);
+            });
+        }
+
+        function cleanMarkdown(text) {
+            return text
+                .replace(/[#*`_]/g, '')
+                .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+                .substring(0, 120) + (text.length > 120 ? '...' : '');
+        }
+
+        // Loop de busca
+        fetchNewReleases();
+        setInterval(fetchNewReleases, 25000); // 25 segundos para evitar ban da API
     </script>
 </body>
 </html>
